@@ -45,10 +45,10 @@ foo <- packageDescription("GRTS")
 
 \tableofcontents
 
-\chapter{Short introduction to GRTS}
-Yet to be written\ldots \citep{Stevens_Olsen_2004, Stevens_Olsen_2003, Stevens_Olsen_1999}
+\chapter{Short introduction to general randomized tessellation stratified sampling (GRTS)}
+Yet to be written\ldots \citep{Stevens_Olsen_2004, Stevens_Olsen_2003, Stevens_Olsen_1999, Theobald_etal_2007}
 
-\chapter{Our implementation of general randomized tessellation stratified sampling}
+\chapter{Our implementation of GRTS}
 
 For the sake of simplicity we assume that we have a square grid with 8 rows and 8 columns and we would like to take a spatially balanced sample of \Sexpr{n} grid cells. Each grid cell has a unique set of 2D coordinates: the row id and the column id (table ref{tab:2D}).
 
@@ -73,7 +73,7 @@ tmp <- matrix(c(rep(rep(c(1, 0), each = 4), 4), rep(rep(c(3, 2), each = 4), 4)),
 print(xtable(tmp, align = "r|rrrr|rrrr|", digits = 0, label = "tab:Level1_1D", caption = "Base 4 1D codes for the first level of submatrices."), include.rownames = FALSE, include.colnames = FALSE, hline.after = c(0, 4, 8))
 @
 
-The next step is to split the four submatrices again in each four subsubmatrices (level 2). Like before we number them from 0 to 3 (table \ref{tab:Level2_1D}). Next we prepend this number to the code of the submatrices (table \ref{tab:Level2_1Dc}).
+The next step is to split each submatrix again in each four subsubmatrices (level 2). Like before we number them from 0 to 3 (table \ref{tab:Level2_1D}). Next we prepend this number to the code of the submatrices (table \ref{tab:Level2_1Dc}).
 
 <<results = tex>>=
 tmp2 <- matrix(c(rep(rep(c(1, 0), each = 2), 4), rep(rep(c(3, 2), each = 2), 4)), ncol = 8, nrow = 8)
@@ -122,7 +122,7 @@ print(xtable(tmp, digits = 0, align = "r||rr|rr||rr|rr||", label = "tab:Ex8L", c
 
 \section{Sampling}
 
-The procedure above generates a randomised and spatially balanced order of grid cells. Sampling $n$ grid cells reduces to taking the first $n$ grid cells along the randomised order.
+The procedure above generates a randomised and spatially balanced order of grid cells. Sampling $n$ grid cells reduces to taking the first $n$ grid cells along the randomised order. Table \ref{tab:Ex8Sample} is a sample of \Sexpr{n} grid cells from table \ref{tab:Ex8L}.
 
 <<results = tex>>=
 print(xtable(ifelse(tmp < n, "X", ""), align = "c||cc|cc||cc|cc||", label = "tab:Ex8Sample", caption = paste("A sample of", n , "points for table \\ref{tab:Ex8L}")), include.rownames = FALSE, include.colnames = FALSE, hline.after = c(0, 0, 2, 4, 4, 6, 8, 8))
@@ -130,15 +130,17 @@ print(xtable(ifelse(tmp < n, "X", ""), align = "c||cc|cc||cc|cc||", label = "tab
 
 We replicate the sampling \Sexpr{reps} times to check whether a) each grid cell has the same probability of being selected and b) the sampling is spatially balanced. 
 
-The first assumption is checked in table \ref{tab:PropL3}. The probability of being selected is very similar for all grid cells and near to the expected probability. Note that for computational reasons we limited the number of replications to \Sexpr{reps}. As the number of replications increases, the differences among grid cells would be come smaller. 
+The first assumption is checked in table \ref{tab:PropL3}. The probability of being selected is very similar for all grid cells and near to the expected probability. Note that for computational reasons we limited the number of replications to \Sexpr{reps}. As the number of replications increases, the differences among grid cells will be smaller. 
 
 <<results = tex>>=
 samples <- replicate(reps, GRTS(8) < n)
 p3 <- apply(samples, 1:2, sum)
-print(xtable(matrix(sprintf("%2.1f%%", 100 * p3 / reps), ncol = 8), align = "c||cc|cc||cc|cc||", label = "tab:PropL3", caption = paste("Proportion of", reps , "replications in which the grid cell is selected when sampling", n, "grid cells using GRTS. The expected proportion is", sprintf("%2.1f\\%%", 100 * n/(8^2)))), include.rownames = FALSE, include.colnames = FALSE, hline.after = c(0, 0, 2, 4, 4, 6, 8, 8))
+print(xtable(matrix(sprintf("%2.1f%%", 100 * p3 / reps), ncol = 8), align = "c||cc|cc||cc|cc||", label = "tab:PropL3", caption = paste("Proportion of", reps , "replications in which the grid cell is selected when sampling", n, "grid cells using GRTS. The expected proportion is", 
+sprintf("$\\frac{%i}{8^2}=%2.1f\\%%$", n, 100 * n/(8^2))
+)), include.rownames = FALSE, include.colnames = FALSE, hline.after = c(0, 0, 2, 4, 4, 6, 8, 8))
 @
 
-The second assumption is checked for the level 1 submatrices in fig.~\ref{fig:HistL1} and for te level 2 submatrices in fig.~\ref{fig:HistL2}. Each subplot is a histogram of the number of samples in each submatrix. Note that all the histogram are nearly identical. Since each submatrix represents a part of the grid, we can conclude that the GRTS sampling is spatially balanced.
+The second assumption is checked for the level 1 submatrices in fig.~\ref{fig:HistL1} and for the level 2 submatrices in fig.~\ref{fig:HistL2}. Each subplot is a histogram of the number of samples in each submatrix. Note that all the histogram are nearly identical. Since each submatrix represents a part of the grid, we can conclude that the GRTS sampling is spatially balanced.
 
 \begin{figure}
 \centering
@@ -171,9 +173,9 @@ print(ggplot(tmp, aes(x = Samples)) + geom_histogram(binwidth = 1) + facet_grid(
 \end{figure}
 
 \chapter{Using the package}
-The work horse of the package is \texttt{QuadratRanking()} function. This function requires a zero-filled, square matrix with the number of rows equal to a power of 2. However the function does not do any checking on those assumptions. That would be a computational burden since the function is called recursively. Therefore one should not call \texttt{QuadratRanking()} directly but use the global wrapper function \texttt{GRTS()}. This wrapper function handles more conviniently different input formats.
+The workhorse of the package is the \texttt{QuadratRanking()} function. This function expects a zero-filled, square matrix with the number of rows equal to a power of 2. However the function does not do any checking on those assumptions. That would be a computational burden since the function is called recursively. Therefore one should not call \texttt{QuadratRanking()} directly but use the global wrapper function \texttt{GRTS()}. This wrapper function handles more conviniently different input formats.
 
-\section{Getting a GRTS randomisation for a square matrix}
+\section{Calculating a GRTS randomisation for a square matrix}
 
 In case of a square matrix we just supply the number of rows to the \texttt{GRTS()} function. Note that if the number of rows is not a power of 2, then \texttt{QuadratCount()} is run with the next power of 2 as number of rows. Afterwards, the matrix is trimmed to contain the required number of rows.
 <<echo = TRUE>>=
@@ -181,7 +183,7 @@ GRTS(8)
 GRTS(7)
 @
 
-\section{Getting a GRTS randomisation for polygons}
+\section{Calculation a GRTS randomisation for polygons}
 
 Typically GIS-polygons are used to localise the study area. To accomodate this situation, \texttt{GRTS()} can handle objects of the class \texttt{SpatialPolygons}. Let's first create an object with a hypothetical study area consisting of 3 polygons: one island polygon and two adjacent polygons of which one contains a hole.
 
@@ -222,7 +224,7 @@ spplot(output, sp.layout = list(pls), col.regions = terrain.colors(100),
        scales = list(draw = TRUE), xlim = limits[, 1], ylim = limits[, 2])
 @
 
-By default the grid starts at the south-east corner (minimum of both coordinates) of the bounding box of the polygon object. When we specify \texttt{RandomStart = TRUE}, this origin is shifted at random in both direction between \texttt{0} and \texttt{cellsize} units.
+By default the grid starts at the south-west corner (minimum of both coordinates) of the bounding box of the polygon object. When we specify \texttt{RandomStart = TRUE}, this origin is shifted at random in both directions between \texttt{0} and \texttt{cellsize} units.
 
 <<echo = TRUE, fig = TRUE, width=6, height=3>>=
 output <- GRTS(SpP, cellsize = 0.5, RandomStart = TRUE)
@@ -248,6 +250,7 @@ spplot(output, sp.layout = list(pls), scales = list(draw = TRUE),
 Suppose we want a sample of \Sexpr{n} points. After the GRTS randomisation, we select the \Sexpr{n} grid cells with the lowest ranking.
 
 <<echo = TRUE, fig = TRUE, width=6, height=3>>=
+n <- 19
 #calculate the treshold value
 MaxRanking <- max(head(sort(output$Ranking), n))
 #do the selection
