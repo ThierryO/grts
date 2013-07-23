@@ -50,6 +50,8 @@ setGeneric("GRTS", function(object, ...) {
 #'  \item{\code{signature(object = "numeric")}}{Use \code{GRTS.default}}
 #'  \item{\code{signature(object = "SpatialPoints")}}{Use \code{GRTS.point}}
 #'  \item{\code{signature(object = "SpatialPointsDataFrame")}}{Use \code{GRTS.point}}
+#'  \item{\code{signature(object = "SpatialGrid")}}{Use \code{GRTS.grid}}
+#'  \item{\code{signature(object = "SpatialGridDataFrame")}}{Use \code{GRTS.grid}}
 #'  \item{\code{signature(object = "SpatialPolygons")}}{Use \code{GRTS.polygon}}
 #'  \item{\code{signature(object = "SpatialPolygonsDataFrame")}}{Use \code{GRTS.polygon}}
 #' }

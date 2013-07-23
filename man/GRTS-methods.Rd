@@ -1,12 +1,14 @@
 \docType{methods}
-\name{GRTS-methods}
+\name{GRTS}
 \alias{GRTS}
 \alias{GRTS-methods}
 \alias{GRTS,numeric-method}
-\alias{GRTS,SpatialPoints-method}
+\alias{GRTS,SpatialGridDataFrame-method}
+\alias{GRTS,SpatialGrid-method}
 \alias{GRTS,SpatialPointsDataFrame-method}
-\alias{GRTS,SpatialPolygons-method}
+\alias{GRTS,SpatialPoints-method}
 \alias{GRTS,SpatialPolygonsDataFrame-method}
+\alias{GRTS,SpatialPolygons-method}
 \title{The GRTS wrapper function}
 \arguments{
   \item{object}{The object on which to generate a GRTS
@@ -27,6 +29,9 @@
   \item{\code{signature(object = "SpatialPoints")}}{Use
   \code{GRTS.point}} \item{\code{signature(object =
   "SpatialPointsDataFrame")}}{Use \code{GRTS.point}}
+  \item{\code{signature(object = "SpatialGrid")}}{Use
+  \code{GRTS.grid}} \item{\code{signature(object =
+  "SpatialGridDataFrame")}}{Use \code{GRTS.grid}}
   \item{\code{signature(object = "SpatialPolygons")}}{Use
   \code{GRTS.polygon}} \item{\code{signature(object =
   "SpatialPolygonsDataFrame")}}{Use \code{GRTS.polygon}} }
@@ -35,11 +40,13 @@
 GRTS(4)
 }
 \seealso{
-  \code{\link{GRTS.default}}
+  \code{\link{GRTS.grid}}
 
   \code{\link{GRTS.point}}
 
   \code{\link{GRTS.polygon}}
+
+  \code{\link{GRTS.default}}
 }
 \keyword{methods}
 

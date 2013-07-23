@@ -1,8 +1,8 @@
 Package: GRTS
 Type: Package
 Title: Spatially balanced sampling based on GRTS
-Version: 0.1.5-60
-Date: 2013-05-30
+Version: 0.1.6-61
+Date: 2013-07-24
 Author: Thierry Onkelinx, Paul Quataert
 Maintainer: Thierry Onkelinx <Thierry.Onkelinx@inbo.be>
 Description: Spatially balanced sampling based on the general randomized 
