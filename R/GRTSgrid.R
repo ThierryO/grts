@@ -33,6 +33,7 @@ GRTS.grid <- function(spGrid, ...){
 #' @method GRTS SpatialGrid-method
 #' @keywords methods
 #' @seealso \code{\link{GRTS.grid}}
+#' @importFrom methods setMethod
 setMethod("GRTS", signature(object = "SpatialGrid"), function(object, ...) {
   GRTS.grid(spGrid = object, ...)
 })
@@ -42,6 +43,7 @@ setMethod("GRTS", signature(object = "SpatialGrid"), function(object, ...) {
 #' @rdname GRTS-methods
 #' @aliases GRTS,SpatialGridDataFrame-method
 #' @method GRTS SpatialGridDataFrame-method
+#' @importFrom methods setMethod
 setMethod("GRTS", signature(object = "SpatialGridDataFrame"), function(object, ...) {
   GRTS.grid(spGrid = object, ...)
 })

@@ -2,6 +2,7 @@
 % Please edit documentation in R/GRTS.R, R/GRTSgrid.R, R/GRTSpoints.R, R/GRTSpolygons.R
 \docType{methods}
 \name{GRTS-methods}
+\alias{GRTS}
 \alias{GRTS,SpatialGrid-method}
 \alias{GRTS,SpatialGridDataFrame-method}
 \alias{GRTS,SpatialPoints-method}

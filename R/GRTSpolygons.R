@@ -3,6 +3,7 @@
 #' @rdname GRTS-methods
 #' @aliases GRTS,SpatialPolygons-method
 #' @method GRTS SpatialPolygons-method
+#' @importFrom methods setMethod
 setMethod("GRTS", signature(object = "SpatialPolygons"), function(object, ...) {
   args <- list(...)
   if("cellsize" %in% names(args)){
@@ -29,6 +30,7 @@ setMethod("GRTS", signature(object = "SpatialPolygons"), function(object, ...) {
 #' @aliases GRTS,SpatialPolygonsDataFrame-method
 #' @method GRTS SpatialPolygonsDataFrame-method
 #' @seealso \code{\link{GRTS.polygon}}
+#' @importFrom methods setMethod
 setMethod("GRTS", signature(object = "SpatialPolygonsDataFrame"), function(object, ...) {
   args <- list(...)
   if("cellsize" %in% names(args)){

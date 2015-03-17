@@ -49,6 +49,7 @@ GRTS.point <- function(spPoint, cellsize, RandomStart = TRUE){
 #' @method GRTS SpatialPoints-method
 #' @keywords methods
 #' @seealso \code{\link{GRTS.point}}
+#' @importFrom methods setMethod
 setMethod("GRTS", signature(object = "SpatialPoints"), function(object, ...) {
   args <- list(...)
   if("RandomStart" %in% names(args)){
@@ -68,6 +69,7 @@ setMethod("GRTS", signature(object = "SpatialPoints"), function(object, ...) {
 #' @rdname GRTS-methods
 #' @aliases GRTS,SpatialPointsDataFrame-method
 #' @method GRTS SpatialPointsDataFrame-method
+#' @importFrom methods setMethod
 setMethod("GRTS", signature(object = "SpatialPointsDataFrame"), function(object, ...) {
   args <- list(...)
   if("RandomStart" %in% names(args)){

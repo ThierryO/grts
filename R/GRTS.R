@@ -3,7 +3,6 @@
 #'Create a square matrix containing a randomised order of grid cells based on
 #'the GRTS algorithm.
 #'
-#'
 #'@param nrow The number of row and columns of the desired square output
 #'matrix. Must be a power of 2.
 #'@return A square matrix with the dimensions of \code{object} filled with a
@@ -25,6 +24,7 @@ GRTS.default <- function(nrow) {
 }
 
 #' @name GRTS-methods
+#' @aliases GRTS
 #' @title The GRTS wrapper function
 #' @description The GRTS wrapper function selects the appropriate GRTS function based on the object.
 #' @param object The object on which to generate a GRTS sample
@@ -34,6 +34,7 @@ GRTS.default <- function(nrow) {
 #' @docType methods
 #' @rdname GRTS-methods
 #' @keywords methods
+#' @importFrom methods setGeneric
 setGeneric("GRTS", function(object, ...) {
    standardGeneric("GRTS")
 })
@@ -43,6 +44,7 @@ setGeneric("GRTS", function(object, ...) {
 #' @docType methods
 #' @rdname GRTS-methods
 #' @aliases GRTS,numeric-method
+#' @aliases GRTS
 #' @method GRTS numeric-method
 #' @seealso \code{\link{GRTS.default}}
 #' @section Methods:
@@ -57,7 +59,7 @@ setGeneric("GRTS", function(object, ...) {
 #' }
 #' @examples
 #'  GRTS(4)
+#'  @importFrom methods setMethod
 setMethod("GRTS", signature(object = "numeric"), function(object, ...) {
   GRTS.default(nrow = object)
 })
-
