@@ -3,7 +3,7 @@ GRTS.default <- function(nrow) {
   Result <- QuadratRanking(matrix(0L, ncol = nrow0, nrow = nrow0), Level = 0)
   if((log2(nrow) %% 2) != 0){
     Result <- Result[seq_len(nrow), seq_len(nrow)]
-    Result <- matrix(as.numeric(factor(Result)), nrow = nrow)
+    Result <- matrix(as.numeric(factor(Result)) - 1, nrow = nrow)
   }
   return(Result)
 }
@@ -43,9 +43,13 @@ GRTS.polygon <- function(spPolygon, cellsize, Subset = FALSE, RandomStart = FALS
   DimGrid <- 2 ^ ceiling(log2(DimGrid))
 
   Result <- QuadratRanking(matrix(0L, ncol = DimGrid, nrow = DimGrid), Level = 0)
-  Result <- Result[seq_len(ceiling(diff(Xrange)/cellsize)), seq_len(ceiling(diff(Yrange)/cellsize))]
   if(RandomStart){
-    GRID <- GridTopology(cellcentre.offset = c(x = min(Xrange), y = min(Yrange)) + runif(2, min = 0, max = cellsize), cellsize = c(cellsize, cellsize), cells.dim = dim(Result))
+    Result <- Result[seq_len(ceiling(diff(Xrange)/cellsize) + 1), seq_len(ceiling(diff(Yrange)/cellsize) + 1)]
+  } else {
+    Result <- Result[seq_len(ceiling(diff(Xrange)/cellsize)), seq_len(ceiling(diff(Yrange)/cellsize))]
+  }
+  if(RandomStart){
+    GRID <- GridTopology(cellcentre.offset = c(x = min(Xrange), y = min(Yrange)) + runif(2, min = -cellsize, max = 0), cellsize = c(cellsize, cellsize), cells.dim = dim(Result))
   } else {
     GRID <- GridTopology(cellcentre.offset = c(x = min(Xrange), y = min(Yrange)) + 0.5 * cellsize, cellsize = c(cellsize, cellsize), cells.dim = dim(Result))
   }
@@ -61,6 +65,6 @@ GRTS.polygon <- function(spPolygon, cellsize, Subset = FALSE, RandomStart = FALS
     }
     gridded(Result) <- TRUE
   }
-  Result$Ranking <- as.numeric(factor(Result$Ranking))
+  Result$Ranking <- as.numeric(factor(Result$Ranking)) - 1
   Result
 }
