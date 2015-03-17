@@ -1,1 +1,4 @@
+importFrom("ggplot2", ggplot, geom_histogram, facet_wrap)
+importFrom("xtable", print.xtable, xtable)
+importFrom("plyr", ddply, .)
 export(QuadratRanking, GRTS, GRTS.default, GRTS.polygon)

@@ -1,9 +1,11 @@
 GRTS.default <- function(nrow) {
-  if(log2(nrow) %% 1 != 0){
-    warning("nrow must be a power of 2. It is increased to the nearest power of 2.")
-    nrow <- 2 ^ ceiling(log2(nrow))
-  }  
-  QuadratRanking(matrix(0L, ncol = nrow, nrow = nrow), Level = 0)
+  nrow0 <- 2 ^ ceiling(log2(nrow))
+  Result <- QuadratRanking(matrix(0L, ncol = nrow0, nrow = nrow0), Level = 0)
+  if((log2(nrow) %% 2) != 0){
+    Result <- Result[seq_len(nrow), seq_len(nrow)]
+    Result <- matrix(as.numeric(factor(Result)), nrow = nrow)
+  }
+  return(Result)
 }
 
 setGeneric("GRTS", function(object, ...) {
@@ -57,8 +59,8 @@ GRTS.polygon <- function(spPolygon, cellsize, Subset = FALSE, RandomStart = FALS
     } else if("SpatialPolygonsDataFrame" %in% class(spPolygon)){
       Result <- Result[!is.na(over(Result, spPolygon)[, 1]), ]
     }
-    Result <- Result[order(Result$Ranking), ]
-    Result$Ranking <- seq_along(Result$Ranking)
+    gridded(Result) <- TRUE
   }
+  Result$Ranking <- as.numeric(factor(Result$Ranking))
   Result
 }
