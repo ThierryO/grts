@@ -1,14 +1,14 @@
 \docType{methods}
-\name{GRTS}
+\name{GRTS-methods}
 \alias{GRTS}
 \alias{GRTS-methods}
 \alias{GRTS,numeric-method}
-\alias{GRTS,SpatialGridDataFrame-method}
 \alias{GRTS,SpatialGrid-method}
-\alias{GRTS,SpatialPointsDataFrame-method}
+\alias{GRTS,SpatialGridDataFrame-method}
 \alias{GRTS,SpatialPoints-method}
-\alias{GRTS,SpatialPolygonsDataFrame-method}
+\alias{GRTS,SpatialPointsDataFrame-method}
 \alias{GRTS,SpatialPolygons-method}
+\alias{GRTS,SpatialPolygonsDataFrame-method}
 \title{The GRTS wrapper function}
 \arguments{
   \item{object}{The object on which to generate a GRTS
@@ -40,13 +40,13 @@
 GRTS(4)
 }
 \seealso{
+  \code{\link{GRTS.default}}
+
   \code{\link{GRTS.grid}}
 
   \code{\link{GRTS.point}}
 
   \code{\link{GRTS.polygon}}
-
-  \code{\link{GRTS.default}}
 }
 \keyword{methods}
 

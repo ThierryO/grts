@@ -1,4 +1,4 @@
-#' Perform a GRTS sampling on a database table via ODBC
+#' Perform a GRTS sampling on a access database table via ODBC
 #' 
 #' @param channel an ODBC channel to the database
 #' @param tablename the name of the table in the database
@@ -7,9 +7,11 @@
 #' @param samplesize the required sample size
 #' @param availableLevels the number of available GRTS levels in the database. These must be named L01, L02, ... Currently available levels is limited to 99
 #' @param reset logical value. If FALSE the current GRTS randomisation is completed. If TRUE a new GRTS randomisation will start.
+#' @param prefix Prefix of the fields that store the randomisation
+#' @param prob The name of the fields with the sampling probability
 #' @importFrom RODBC odbcClose sqlTables sqlQuery
 #' @export
-GRTS.ODBC <- function(channel, tablename, grts.vars, cellsize, samplesize, availableLevels = 20, reset = FALSE){
+GRTS.access <- function(channel, tablename, grts.vars, cellsize, samplesize, availableLevels = 20, reset = FALSE, prefix = "L", prob){
   if(!tablename %in% sqlTables(channel = channel)$TABLE_NAME){
     stop("table ", tablename, " does not exists.")
   }
@@ -19,7 +21,7 @@ GRTS.ODBC <- function(channel, tablename, grts.vars, cellsize, samplesize, avail
   
   
   
-  GRTS.ODBC.Update <- function(thisSample, maxLevel, grts.vars, tablename, Low, Range, channel = channel){
+  GRTS.ODBC.Update <- function(thisSample, maxLevel, grts.vars, tablename, Low, Range, channel, prefix){
     Level <- 1 + maxLevel - max(which(is.na(thisSample)))
     Sign <- sample(c(" >= ", " < "), length(grts.vars), replace = TRUE)
     Index <- sample(length(grts.vars)) - 1
@@ -36,7 +38,7 @@ GRTS.ODBC <- function(channel, tablename, grts.vars, cellsize, samplesize, avail
     Mid <- Low + (Position + 0.5) * Range / 2 ^ (Level - 1)
     SQL <- paste(2 ^ Index, " * (", grts.vars, Sign, Mid, ")", sep = "")
     SQL <- paste(SQL, collapse = " - ")
-    SQL <- paste("UPDATE", tablename, "SET", sprintf("L%02i", Level), "= -", SQL, "WHERE", paste(whereStatement, collapse = " AND "))
+    SQL <- paste("UPDATE", tablename, "SET", sprintf("%s%02i", prefix, Level), "= -", SQL, "WHERE", paste(whereStatement, collapse = " AND "))
     sqlQuery(channel = channel, query = SQL)
   }
 
@@ -51,7 +53,7 @@ GRTS.ODBC <- function(channel, tablename, grts.vars, cellsize, samplesize, avail
 
   #reset the GRTS sample
   if(reset){
-    SQL <- paste("UPDATE", tablename, "SET", paste(sprintf("L%02i = NULL", seq_len(availableLevels)), collapse = ", "))
+    SQL <- paste("UPDATE", tablename, "SET", paste(sprintf("%s%02i = NULL", prefix, seq_len(availableLevels)), collapse = ", "))
     sqlQuery(channel = channel, query = SQL)
   }
   
@@ -66,14 +68,28 @@ GRTS.ODBC <- function(channel, tablename, grts.vars, cellsize, samplesize, avail
   Low <- Mid - Range / 2
 
   
-  SQLsample <- paste(sprintf("L%02i", rev(seq_len(maxLevel))), collapse = ", ")
-  SQLsample2 <- paste(sprintf("iif(IsNull(L%02i), 0, L%02i)", rev(seq_len(maxLevel)), rev(seq_len(maxLevel))), collapse = ", ")
-  SQLsample <- paste("SELECT TOP", samplesize, "Count(ID) AS Points,", SQLsample, "FROM", tablename, "GROUP BY", SQLsample, "ORDER BY", SQLsample2)
+  SQLsample1 <- paste(sprintf("%s%02i", prefix, rev(seq_len(maxLevel))), collapse = ", ")
+  SQLsample2 <- paste(sprintf("iif(IsNull(%s%02i), 0, %s%02i)", prefix, rev(seq_len(maxLevel)), prefix, rev(seq_len(maxLevel))), collapse = ", ")
+  if(missing(prob)){
+    SQLsample <- paste("SELECT TOP", samplesize, SQLsample1, "FROM", tablename, "GROUP BY", SQLsample1, "ORDER BY", SQLsample2)
+  } else {
+    SQLsample <- paste("SELECT TOP", samplesize, "SUM(", prob, ") AS Prob, ", SQLsample1, "FROM", tablename, "WHERE", prob, "> 0 GROUP BY", SQLsample1, "ORDER BY", SQLsample2)
+  }
   Sample <- sqlQuery(channel = channel, query = SQLsample)
   while(any(is.na(Sample))){
-    Sample <- Sample[is.na(Sample[, 2]), ]
-    junk <- apply(Sample[, -1], 1, FUN = GRTS.ODBC.Update, maxLevel = maxLevel, grts.vars = grts.vars, tablename = tablename, channel = channel, Low = Low, Range = Range)
+    if(missing(prob)){
+      Sample <- Sample[is.na(Sample[, 1]), ]
+      junk <- apply(Sample, 1, FUN = GRTS.ODBC.Update, maxLevel = maxLevel, grts.vars = grts.vars, tablename = tablename, channel = channel, Low = Low, Range = Range, prefix = prefix)
+    } else {
+      Sample <- Sample[is.na(Sample[, 2]), ]
+      junk <- apply(Sample[, -1], 1, FUN = GRTS.ODBC.Update, maxLevel = maxLevel, grts.vars = grts.vars, tablename = tablename, channel = channel, Low = Low, Range = Range, prefix = prefix)
+      if(sum(Sample$Prob) < samplesize){
+        samplesize <- ceiling(samplesize * 1.1)
+        SQLsample <- paste("SELECT TOP", samplesize, "SUM(", prob, ") AS Prob, ", SQLsample1, "FROM", tablename, "WHERE", prob, "> 0 GROUP BY", SQLsample1, "ORDER BY", SQLsample2)
+      }
+    }
     Sample <- sqlQuery(channel = channel, query = SQLsample)
+    Sample
   }
   odbcClose(channel)
 }
