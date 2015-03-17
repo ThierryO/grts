@@ -11,7 +11,7 @@
 \usepackage[sort&compress]{natbib}
 
 % \VignetteIndexEntry{Introduction to the GRTS package}
-% \VignetteDepends{methods, plyr, ggplot2, xtable, reshape}
+% \VignetteDepends{methods, plyr, ggplot2, xtable, reshape, sp}
 % \VignetteKeyword{GRTS}
 % \VignetteKeyword{sampling}
 % \VignetteKeyword{spatially balance}
@@ -32,32 +32,33 @@ library(xtable)
 library(plyr)
 library(ggplot2)
 library(reshape)
+library(sp)
 theme_set(theme_grey(8))
 options(width = 60)
 options(str = strOptions(strict.width = "cut"))
 foo <- packageDescription("GRTS")
 @
 
-\title{Introduction to the '\texttt{GRTS}' package\\(version \Sexpr{foo$Version})}
+\title{Introduction to the `\texttt{GRTS}' package\\(version \Sexpr{foo$Version})}
 
 \author{ir. Thierry Onkelinx}
 \maketitle
 
 \tableofcontents
 
-\chapter{Short introduction to general randomized tessellation stratified sampling (GRTS)}
+\chapter{Short introduction to Generalized Random Tessellation Stratified sampling (GRTS)}
 Yet to be written\ldots \citep{Stevens_Olsen_2004, Stevens_Olsen_2003, Stevens_Olsen_1999, Theobald_etal_2007}
 
 \chapter{Our implementation of GRTS}
 
-For the sake of simplicity we assume that we have a square grid with 8 rows and 8 columns and we would like to take a spatially balanced sample of \Sexpr{n} grid cells. Each grid cell has a unique set of 2D coordinates: the row id and the column id (table ref{tab:2D}).
+For the sake of simplicity we assume that we have a square grid with 8 rows and 8 columns and we would like to take a spatially balanced sample of \Sexpr{n} grid cells. Each grid cell has a unique set of 2D coordinates: the row id and the column id (table~\ref{tab:2D}).
 
 <<results = tex>>=
 tmp <- matrix(paste("(", rep(7:0, 8), ",", rep(0:7, each = 8), ")", sep = ""), ncol = 8, nrow = 8)
 print(xtable(tmp, align = "r|rrrrrrrr|", label = "tab:2D", caption = "2D coordinates of a 8 x 8 matrix"), include.rownames = FALSE, include.colnames = FALSE, hline.after = c(0, 8))
 @
 
-\section{Coding of 2D coordinates to 1D address}
+\section{Coding of 2D coordinates into 1D address}
 
 We start the convertion by splitting the matrix in 4 submatrices (level 1). We split it in half along the x-axis and in half along the y-axis. A single binary digit for each axis is sufficient to give each submatrix a unique 2D code (table \ref{tab:Level1_2D}).
 
@@ -265,7 +266,6 @@ Let us test whether GRTS does a better job at generating a spatially balanced sa
 The figure below shows the distribution with the number of samples for the three polygons. Polygon A is medium sided polygon without hole. Polygon B is the small triangular polygon. Polygon C is the large polygon with a hole. The expected number of samples is indicates with a blue line. The distribution from the GRTS sampling have a smaller variance than the simple random sampling, indicating that GRTS sampling is more spatially balanced.
 
 <<echo = TRUE, fig = TRUE, eval = FALSE>>=
-reps <- 1000
 testGRTS <- t(replicate(reps, {
   #do the randomisation
   output <- GRTS(SpP, cellsize = 0.1, Subset = TRUE, RandomStart = TRUE)
@@ -316,6 +316,59 @@ ggsave(p, filename = "GRTS_SRS_distribution.pdf", width = 4, height = 4, path = 
 @
 
 \includegraphics{GRTS_SRS_distribution}
+
+\section{Unequal probability sampling}
+
+<<eval = FALSE, echo = TRUE>>=
+Weights <- data.frame(
+  ID = c("s1", "s2", "s3/4"), 
+  Weight = c(1, 5, 2)
+)
+rownames(Weights) <- Weights$ID
+Weights$Expected <- n * areas * Weights$Weight / sum(areas * Weights$Weight)
+SpP <- SpatialPolygonsDataFrame(SpP, data = Weights)
+SpP$ID <- factor(SpP$ID)
+test <- replicate(reps, {
+  GRTSorder <- GRTS(SpP, cellsize = 0.1, Subset = TRUE)
+  GRTSorder$Weight <- over(GRTSorder, SpP[, "Weight"])$Weight / (max(SpP$Weight))
+  GRTSorder$Weight <- 
+    GRTSorder$Weight * 
+    pmin(
+      1, 
+      length(GRTSorder) / sum(GRTSorder$Weight)
+    )
+  GRTSups <- 
+    GRTSorder[
+      rbinom(
+        length(GRTSorder), 
+        size = 1, 
+        prob = GRTSorder$Weight
+      ) == 1, 
+      "Ranking"]
+  table(
+    over(
+      GRTSups[order(GRTSups$Ranking) <= n, ], 
+      SpP[, "ID"]
+    )$ID,
+    useNA = 'ifany')
+})
+test <- melt(t(test))
+colnames(test) <- c("Run", "ID", "Estimate")
+test <- merge(test, Weights)
+ggplot(test, aes(x = Estimate)) + 
+  geom_histogram(binwidth = 1) + 
+  geom_vline(aes(xintercept = Expected), colour = "red") + 
+  xlab("Number of samples per polygon") + 
+  facet_wrap(~ID)
+@
+
+<<eval = FALSE, echo = FALSE, results = hide>>=
+p <- 
+  ggplot(test, aes(x = Estimate)) + geom_histogram(binwidth = 1) + geom_vline(aes(xintercept = Expected), colour = "red") + xlab("Number of samples per polygon") + facet_wrap(~ID)
+ggsave(p, filename = "GRTS_UPS_distribution.pdf", width = 4, height = 4, path = 'pkg/GRTS/vignettes')
+@
+
+\includegraphics{GRTS_UPS_distribution}
 
 \bibliographystyle{plainnat}
 \bibliography{grts}
