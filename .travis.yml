@@ -1,0 +1,28 @@
+language: R
+sudo: required
+
+apt_packages:
+  - r-cran-rodbc
+  - libcurl3
+  
+r_packages: 
+  - sp 
+  - spatstat 
+  - plyr 
+  - ggplot2 
+  - xtable 
+  - reshape 
+  - knitr
+  - curl
+
+# use for code coverage of tests
+r_github_packages:
+  - jimhester/covr
+
+after_success:
+  - Rscript -e 'covr::codecov()'
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
