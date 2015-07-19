@@ -3,7 +3,7 @@ sudo: required
 
 apt_packages:
   - r-cran-rodbc
-  - libcurl
+  - libcurl3
   
 r_packages: 
   - sp 
