@@ -1,4 +1,12 @@
-language:   r
-sudo:       required
+language: R
+sudo: required
 
-r_packages: sp spatstat RODBC plyr ggplot2 xtable reshape knitr
+r_packages: 
+  - sp 
+  - spatstat 
+  - RODBC 
+  - plyr 
+  - ggplot2 
+  - xtable 
+  - reshape 
+  - knitr
