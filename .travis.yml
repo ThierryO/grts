@@ -1,10 +1,12 @@
 language: R
 sudo: required
 
+apt_packages:
+  - r-cran-rodbc
+  
 r_packages: 
   - sp 
   - spatstat 
-  - RODBC 
   - plyr 
   - ggplot2 
   - xtable 
