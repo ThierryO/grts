@@ -13,3 +13,8 @@ r_packages:
   - xtable 
   - reshape 
   - knitr
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
