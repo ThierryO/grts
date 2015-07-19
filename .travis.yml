@@ -1,0 +1,5 @@
+language:   r
+sudo:       required
+
+r_packages: sp, spatstat, RODBC, plyr, ggplot2, xtable, reshape, knitr
+
