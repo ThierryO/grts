@@ -19,6 +19,7 @@ Imports:
   spatstat, 
   RODBC
 Suggests: 
+  testthat,
   plyr, 
   ggplot2, 
   xtable, 
