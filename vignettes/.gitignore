@@ -6,3 +6,7 @@ GRTS.toc
 GRTS.log
 GRTS.bbl
 GRTS-concordance.tex
+*.R
+*.aux
+*.blg
+*.out
