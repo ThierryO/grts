@@ -14,6 +14,13 @@ r_packages:
   - reshape 
   - knitr
 
+# use for code coverage of tests
+r_github_packages:
+  - jimhester/covr
+
+after_success:
+  - Rscript -e 'covr::codecov()'
+
 notifications:
   email:
     on_success: change
