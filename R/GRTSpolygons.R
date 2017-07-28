@@ -7,22 +7,26 @@
 #' @importFrom stats runif
 setMethod("GRTS", signature(object = "SpatialPolygons"), function(object, ...) {
   args <- list(...)
-  if("cellsize" %in% names(args)){
-    cellsize <- args[["cellsize"]]
-  } else {
+  if (!"cellsize" %in% names(args)) {
     stop("cellsize must be defined")
   }
-  if("Subset" %in% names(args)){
+  cellsize <- args[["cellsize"]]
+  if ("Subset" %in% names(args)) {
     Subset <- args[["Subset"]]
   } else {
     Subset <- FALSE
   }
-  if("RandomStart" %in% names(args)){
+  if ("RandomStart" %in% names(args)) {
     RandomStart <- args[["RandomStart"]]
   } else {
     RandomStart <- FALSE
   }
-  GRTS.polygon(spPolygon = object, cellsize = cellsize, Subset = Subset, RandomStart = RandomStart)
+  GRTS.polygon(
+    spPolygon = object,
+    cellsize = cellsize,
+    Subset = Subset,
+    RandomStart = RandomStart
+  )
 })
 
 #' @export
@@ -32,25 +36,33 @@ setMethod("GRTS", signature(object = "SpatialPolygons"), function(object, ...) {
 #' @method GRTS SpatialPolygonsDataFrame-method
 #' @seealso \code{\link{GRTS.polygon}}
 #' @importFrom methods setMethod
-setMethod("GRTS", signature(object = "SpatialPolygonsDataFrame"), function(object, ...) {
-  args <- list(...)
-  if("cellsize" %in% names(args)){
+setMethod(
+  "GRTS",
+  signature(object = "SpatialPolygonsDataFrame"),
+  function(object, ...) {
+    args <- list(...)
+    if (!"cellsize" %in% names(args)) {
+      stop("cellsize must be defined")
+    }
     cellsize <- args[["cellsize"]]
-  } else {
-    stop("cellsize must be defined")
+    if ("Subset" %in% names(args)) {
+      Subset <- args[["Subset"]]
+    } else {
+      Subset <- FALSE
+    }
+    if ("RandomStart" %in% names(args)) {
+      RandomStart <- args[["RandomStart"]]
+    } else {
+      RandomStart <- FALSE
+    }
+    GRTS.polygon(
+      spPolygon = object,
+      cellsize = cellsize,
+      Subset = Subset,
+      RandomStart = RandomStart
+    )
   }
-  if("Subset" %in% names(args)){
-    Subset <- args[["Subset"]]
-  } else {
-    Subset <- FALSE
-  }
-  if("RandomStart" %in% names(args)){
-    RandomStart <- args[["RandomStart"]]
-  } else {
-    RandomStart <- FALSE
-  }
-  GRTS.polygon(spPolygon = object, cellsize = cellsize, Subset = Subset, RandomStart = RandomStart)
-})
+)
 
 
 #'Calculate a GRTS SpatialGridDataFrame based on a set of polygongs.
@@ -89,28 +101,54 @@ setMethod("GRTS", signature(object = "SpatialPolygonsDataFrame"), function(objec
 #'  output <- GRTS(SpP, cellsize = 0.1, Subset = TRUE, RandomStart = TRUE)
 #'  spplot(output)
 #'@importFrom sp bbox GridTopology SpatialGridDataFrame gridded<-
-GRTS.polygon <- function(spPolygon, cellsize, Subset = FALSE, RandomStart = FALSE){
+GRTS.polygon <- function(
+  spPolygon,
+  cellsize,
+  Subset = FALSE,
+  RandomStart = FALSE
+){
   Xrange <- bbox(spPolygon)[1, ]
   Yrange <- bbox(spPolygon)[2, ]
   DimGrid <- ceiling(max(diff(Xrange), diff(Yrange)) / cellsize)
   DimGrid <- 2 ^ ceiling(log2(DimGrid))
 
   Result <- QuadratRanking(matrix(0L, ncol = DimGrid, nrow = DimGrid), Level = 0)
-  if(RandomStart){
-    Result <- Result[seq_len(ceiling(diff(Xrange)/cellsize) + 1), seq_len(ceiling(diff(Yrange)/cellsize) + 1)]
-    GRID <- GridTopology(cellcentre.offset = c(x = min(Xrange), y = min(Yrange)) + runif(2, min = -cellsize, max = 0), cellsize = c(cellsize, cellsize), cells.dim = dim(Result))
+  if (RandomStart) {
+    Result <- Result[
+      seq_len(ceiling(diff(Xrange)/cellsize) + 1),
+      seq_len(ceiling(diff(Yrange)/cellsize) + 1)
+    ]
+    GRID <- GridTopology(
+      cellcentre.offset =
+        c(x = min(Xrange), y = min(Yrange)) +
+        runif(2, min = -cellsize, max = 0),
+      cellsize = c(cellsize, cellsize),
+      cells.dim = dim(Result)
+    )
   } else {
-    Result <- Result[seq_len(ceiling(diff(Xrange)/cellsize)), seq_len(ceiling(diff(Yrange)/cellsize))]
-    GRID <- GridTopology(cellcentre.offset = c(x = min(Xrange), y = min(Yrange)) + 0.5 * cellsize, cellsize = c(cellsize, cellsize), cells.dim = dim(Result))
+    Result <- Result[
+      seq_len(ceiling(diff(Xrange)/cellsize)),
+      seq_len(ceiling(diff(Yrange)/cellsize))
+    ]
+    GRID <- GridTopology(
+      cellcentre.offset =
+        c(x = min(Xrange), y = min(Yrange)) +
+        0.5 * cellsize,
+      cellsize = c(cellsize, cellsize),
+      cells.dim = dim(Result))
   }
-  Result <- SpatialGridDataFrame(grid = GRID, data = data.frame(Ranking = as.vector(Result)), proj4string = proj4string(spPolygon))
+  Result <- SpatialGridDataFrame(
+    grid = GRID,
+    data = data.frame(Ranking = as.vector(Result)),
+    proj4string = proj4string(spPolygon)
+  )
   rm(GRID)
-  if(Subset){
+  if (Subset) {
     gc()
     gridded(Result) <- FALSE
-    if("SpatialPolygons" %in% class(spPolygon)){
+    if ("SpatialPolygons" %in% class(spPolygon)) {
       Result <- Result[!is.na(over(Result, spPolygon)), ]
-    } else if("SpatialPolygonsDataFrame" %in% class(spPolygon)){
+    } else if ("SpatialPolygonsDataFrame" %in% class(spPolygon)) {
       Result <- Result[!is.na(over(Result, spPolygon)[, 1]), ]
     }
     gridded(Result) <- TRUE
