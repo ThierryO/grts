@@ -4,6 +4,7 @@
 #' @param base a prime number that is used a the base
 #' @param start the starting position. A random value is used when missing.
 #' @export
+#' @importFrom utils head tail
 vanderCorput <- function(
   size,
   base = 2,
@@ -36,6 +37,7 @@ vanderCorput <- function(
 #' @param dim The number of dimensions of the Halton sequence
 #' @param start Optimal starting values. Generated at random when missing
 #' @export
+#' @importFrom utils head
 #' @examples
 #' plot(halton(size = 100)$coordinates)
 #' points(halton(size = 100)$coordinates, col = "green")

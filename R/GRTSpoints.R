@@ -6,6 +6,7 @@
 #' @export
 #' @importFrom spatstat nndist owin as.ppp as.ppp.matrix as.ppp.data.frame
 #' @importFrom sp gridded over GridTopology coordinates bbox SpatialGridDataFrame proj4string CRS SpatialPointsDataFrame
+#' @importFrom stats runif
 #' @return a SpatialPoints object with
 GRTS.point <- function(spPoint, cellsize, RandomStart = TRUE){
   #cellsize <- 1000

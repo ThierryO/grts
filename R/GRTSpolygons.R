@@ -4,6 +4,7 @@
 #' @aliases GRTS,SpatialPolygons-method
 #' @method GRTS SpatialPolygons-method
 #' @importFrom methods setMethod
+#' @importFrom stats runif
 setMethod("GRTS", signature(object = "SpatialPolygons"), function(object, ...) {
   args <- list(...)
   if("cellsize" %in% names(args)){
