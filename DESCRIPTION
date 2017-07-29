@@ -1,8 +1,8 @@
 Package: GRTS
 Type: Package
-Title: Spatially balanced sampling based on GRTS
-Version: 0.2.0
-Date: 2015-03-17
+Title: Spatially Balanced Sampling Based on GRTS
+Version: 0.2.1
+Date: 2015-07-28
 Author: Thierry Onkelinx, Paul Quataert
 Maintainer: Thierry Onkelinx <Thierry.Onkelinx@inbo.be>
 Description: Spatially balanced sampling based on the general randomized 
@@ -19,6 +19,7 @@ Imports:
   spatstat, 
   RODBC
 Suggests: 
+  testthat,
   plyr, 
   ggplot2, 
   xtable, 
@@ -26,3 +27,4 @@ Suggests:
   knitr
 VignetteBuilder: 
   knitr
+RoxygenNote: 6.0.1

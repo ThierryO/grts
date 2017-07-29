@@ -57,9 +57,9 @@ setGeneric("GRTS", function(object, ...) {
 #'  \item{\code{signature(object = "SpatialPolygons")}}{Use \code{GRTS.polygon}}
 #'  \item{\code{signature(object = "SpatialPolygonsDataFrame")}}{Use \code{GRTS.polygon}}
 #' }
+#' @importFrom methods setMethod
 #' @examples
 #'  GRTS(4)
-#'  @importFrom methods setMethod
 setMethod("GRTS", signature(object = "numeric"), function(object, ...) {
   GRTS.default(nrow = object)
 })

@@ -1,12 +1,13 @@
 #' GRTS sampling on points
-#' 
+#'
 #' @param spPoint A \code{\link{SpatialPoints}} or \code{\link{SpatialPointsDataFrame}} object
 #' @param cellsize The size of the GRTS grid cells. Set at half of the smallest distance between two points when missing.
 #' @param RandomStart logical. Should the starting point of grid be random or not.
 #' @export
 #' @importFrom spatstat nndist owin as.ppp as.ppp.matrix as.ppp.data.frame
 #' @importFrom sp gridded over GridTopology coordinates bbox SpatialGridDataFrame proj4string CRS SpatialPointsDataFrame
-#' @return a SpatialPoints object with 
+#' @importFrom stats runif
+#' @return a SpatialPoints object with
 GRTS.point <- function(spPoint, cellsize, RandomStart = TRUE){
   #cellsize <- 1000
   #RandomStart <- TRUE
@@ -29,7 +30,7 @@ GRTS.point <- function(spPoint, cellsize, RandomStart = TRUE){
   rm(GRID)
   gc()
   if("SpatialPoints" %in% class(spPoint)){
-    spPoint <- 
+    spPoint <-
       SpatialPointsDataFrame(
         coords = coordinates(spPoint),
         data = over(spPoint, Result),
@@ -39,7 +40,7 @@ GRTS.point <- function(spPoint, cellsize, RandomStart = TRUE){
     spPoint$Ranking <- over(spPoint, Result)$Ranking
   }
   spPoint$Ranking <- as.numeric(factor(spPoint$Ranking)) - 1
-  return(list(spPoint = spPoint, GRTS = Result))  
+  return(list(spPoint = spPoint, GRTS = Result))
 }
 
 #' @export

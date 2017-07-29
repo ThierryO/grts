@@ -1,11 +1,12 @@
 #' calculates a van der Corput sequence
-#' 
+#'
 #' @param size the length of the resulting sequence
 #' @param base a prime number that is used a the base
 #' @param start the starting position. A random value is used when missing.
 #' @export
+#' @importFrom utils head tail
 vanderCorput <- function(
-  size, 
+  size,
   base = 2,
   start
   ){
@@ -18,7 +19,7 @@ vanderCorput <- function(
   return(
     list(
       sequence = sapply(
-        n, 
+        n,
         function(n){
           lambda <- floor((n / head(p, -1))  %% base)
           sum(lambda / tail(p, -1))
@@ -31,11 +32,12 @@ vanderCorput <- function(
 }
 
 #' Calculate a Halton sequence
-#' 
+#'
 #' @param size The required length of the Halton sequence
 #' @param dim The number of dimensions of the Halton sequence
 #' @param start Optimal starting values. Generated at random when missing
 #' @export
+#' @importFrom utils head
 #' @examples
 #' plot(halton(size = 100)$coordinates)
 #' points(halton(size = 100)$coordinates, col = "green")
@@ -56,15 +58,15 @@ halton <- function(size, dim = 2, start){
   }
   base <- sample(head(primes, dim))
   coordinates <- sapply(
-    seq_len(dim), 
+    seq_len(dim),
     function(i){
       vanderCorput(size = size, base = base[i], start = start[i])$sequence
     }
   )
   return(
     list(
-      coordinates = coordinates, 
-      base = base, 
+      coordinates = coordinates,
+      base = base,
       start = start
     )
   )
