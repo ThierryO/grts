@@ -100,7 +100,7 @@ setMethod(
 #'  spplot(output)
 #'  output <- GRTS(SpP, cellsize = 0.1, Subset = TRUE, RandomStart = TRUE)
 #'  spplot(output)
-#'@importFrom sp bbox GridTopology SpatialGridDataFrame gridded<-
+#'@importFrom sp bbox GridTopology SpatialGridDataFrame SpatialPixelsDataFrame gridded<-
 GRTS.polygon <- function(
   spPolygon,
   cellsize,
@@ -142,7 +142,6 @@ GRTS.polygon <- function(
     data = data.frame(Ranking = as.vector(Result)),
     proj4string = proj4string(spPolygon)
   )
-  rm(GRID)
   if (Subset) {
     gc()
     gridded(Result) <- FALSE
@@ -151,8 +150,14 @@ GRTS.polygon <- function(
     } else if ("SpatialPolygonsDataFrame" %in% class(spPolygon)) {
       Result <- Result[!is.na(over(Result, spPolygon)[, 1]), ]
     }
-    gridded(Result) <- TRUE
+    Result <- SpatialPixelsDataFrame(
+      Result,
+      data = Result@data,
+      grid = GRID
+    )
   }
+  rm(GRID)
+  gc()
   Result$Ranking <- as.numeric(factor(Result$Ranking)) - 1
   Result
 }
