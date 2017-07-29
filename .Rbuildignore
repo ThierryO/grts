@@ -2,5 +2,4 @@
 ^\.Rproj\.user$
 ^\.gitignore$
 ^\.travis\.yml$
-^.*\.html$
 ^readme\.md$
