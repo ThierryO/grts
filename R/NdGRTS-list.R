@@ -2,7 +2,7 @@
 #' @name NdGRTS-methods
 #' @docType methods
 #' @rdname NdGRTS-methods
-#' @aliases NdGRTS,numeric-method
+#' @aliases NdGRTS,list-method
 #' @aliases NdGRTS
 #' @method NdGRTS list-method
 #' @importFrom methods setMethod
