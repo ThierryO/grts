@@ -4,7 +4,8 @@
 \alias{NdRanking}
 \title{Workhorse for multidimensional GRTS}
 \usage{
-NdRanking(design, level = log2(max(design) + 1) - 1, n_var = ncol(design))
+NdRanking(design, level = floor(log2(max(design) + 1)) - 1,
+  n_var = ncol(design))
 }
 \arguments{
 \item{design}{the design matrix: one column for each dimension. Each column holds integer values between \eqn{0} and \eqn{2^{level+1}}}

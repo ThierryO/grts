@@ -5,7 +5,7 @@
 #' @export
 NdRanking <- function(
   design,
-  level = log2(max(design) + 1) - 1,
+  level = floor(log2(max(design) + 1)) - 1,
   n_var = ncol(design)
 ) {
   random_order <- sample(2 ^ n_var) - 1
