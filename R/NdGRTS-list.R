@@ -6,7 +6,7 @@
 #' @aliases NdGRTS
 #' @method NdGRTS list-method
 #' @importFrom methods setMethod
-#' @importFrom assertthat assert_that
+#' @importFrom assertthat assert_that has_name
 #' @include NdGRTS.R
 setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
   assert_that(
@@ -21,6 +21,10 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
   # make all vectors to length 2^x
   n <- sapply(object, length)
   n2 <- max(2 ^ ceiling(log2(n)))
+  dots <- list(...)
+  if (has_name(dots, "new.length")) {
+    n2 <- max(n2, 2 ^ ceiling(log2(dots$new.length)))
+  }
   for (i in which(n < n2)) {
     link <- unify_length(object[[i]], n2)
     object[[i]] <- link[, "new"]
