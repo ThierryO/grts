@@ -41,3 +41,5 @@ Collate:
     'NdRanking.R'
     'QuadratRanking.R'
     'halton.R'
+    'unify_length.R'
+    'unify_length-integer.R'
