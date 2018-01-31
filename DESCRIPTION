@@ -43,3 +43,4 @@ Collate:
     'halton.R'
     'unify_length.R'
     'unify_length-integer.R'
+    'unify_length-numeric.R'
