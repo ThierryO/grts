@@ -17,6 +17,10 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     all(sapply(object, is.vector)),
     msg = "all elements of object must be vectors"
   )
+  assert_that(
+    all(sapply(object, inherits, what = c("numeric", "integer"))),
+    msg = "all elements of object must be numeric or integer"
+  )
 
   # make all vectors to length 2^x
   n <- sapply(object, length)
