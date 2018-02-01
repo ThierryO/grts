@@ -15,14 +15,9 @@ setMethod("unify_length", signature(x = "numeric"), function(x, new.length) {
   assert_that(anyDuplicated(x) == 0, msg = "vector contains duplicate values")
   assert_that(noNA(x))
 
-  min_diff <- min(diff(sort(x)))
-  step <- diff(range(x)) / new.length
-  if (min_diff < step) {
-    stop(
-      "new.length is too small. Increase it to at least ",
-      ceiling(diff(range(x)) / min_diff)
-    )
+  step <- diff(range(x)) / (new.length - 1)
+  if (anyDuplicated(round(x / step))) {
+    stop("Current new.length = ", new.length, " is too small")
   }
-
-  return(seq(min(x), by = step, length = new.length))
+  return(seq(min(x), max(x), length = new.length))
 })
