@@ -21,6 +21,7 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     all(sapply(object, inherits, what = c("numeric", "integer"))),
     msg = "all elements of object must be numeric or integer"
   )
+  assert_that(!is.null(names(object)), msg = "object has no names")
 
   # make all vectors to length 2^x
   n <- sapply(object, length)
@@ -45,12 +46,25 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     ) # nocov
   }
 
-  for (i in seq_along(object)) {
-    object[[i]] <- unify_length(object[[i]], n2)
-  }
 
-  design <- expand.grid(object)
+  unified <- lapply(object, unify_length, new.length = n2)
+
+  design <- expand.grid(rep(list(seq_len(n2)), length(object)))
+  colnames(design) <- names(object)
   design$Ranking <- NdRanking(as.matrix(design))
+
+  for (i in seq_along(unified)) {
+    if (inherits(object[[i]], "numeric")) {
+      design[, i] <- unified[[i]][design[, i]]
+    } else {
+      distance <- abs(outer(unified[[i]], object[[i]], "-"))
+      nearest <- apply(distance, 2, which.min)
+      design <- design[design[, i] %in% nearest, ]
+      z <- vector("integer", n2)
+      z[nearest] <- object[[i]]
+      design[, i] <- z[design[, i]]
+    }
+  }
 
   return(design)
 })
