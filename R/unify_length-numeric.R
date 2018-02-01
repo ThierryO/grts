@@ -2,9 +2,9 @@
 #' @name unify_length-methods
 #' @docType methods
 #' @rdname unify_length-methods
-#' @aliases unify_length,integer-method
+#' @aliases unify_length,numeric-method
 #' @aliases unify_length
-#' @method unify_length integer-method
+#' @method unify_length numeric-method
 #' @importFrom methods setMethod
 #' @importFrom assertthat assert_that is.count noNA
 #' @include unify_length.R
