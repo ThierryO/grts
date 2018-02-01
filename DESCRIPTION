@@ -38,6 +38,7 @@ Collate:
     'GRTSpolygons.R'
     'NdGRTS.R'
     'NdGRTS-list.R'
+    'NdGRTS-data_frame.R'
     'NdRanking.R'
     'QuadratRanking.R'
     'halton.R'

@@ -1,7 +1,7 @@
 context("NdGRTS on lists")
 test_that("NdGRTS works on simple list", {
   # simple lists = only vectors of same length which is power of 2
-  basic <- list(X = 0:3, Y = 0:3, Z = 0:3, A = 0:3)
+  basic <- list(X = c(0, 1, 2, 3), Y = 0:1, Z = 0:3, A = 0:4)
   test_dimension <- function(basic, n){
     expect_is(
       result <- NdGRTS(basic[seq_len(n)]),
@@ -9,7 +9,7 @@ test_that("NdGRTS works on simple list", {
     )
     expect_identical(
       names(result),
-      c(names(basic)[seq_len(n)], "Ranking")
+      c(names(basic)[seq_len(n)], "OriginalRanking", "Ranking")
     )
     expect_identical(
       anyDuplicated(result$Ranking),
@@ -29,7 +29,7 @@ test_that("NdGRTS checks that the list contains only relevant types", {
   )
   expect_error(
     NdGRTS(object = list(data.frame())),
-    "all elements of object must be vectors"
+    "all elements of object must be numeric or integer"
   )
 })
 

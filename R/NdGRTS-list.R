@@ -14,10 +14,6 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     msg = "object must contain at least one element"
   )
   assert_that(
-    all(sapply(object, is.vector)),
-    msg = "all elements of object must be vectors"
-  )
-  assert_that(
     all(sapply(object, inherits, what = c("numeric", "integer"))),
     msg = "all elements of object must be numeric or integer"
   )
@@ -40,10 +36,10 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     dots$force <- FALSE
   }
   if (!dots$force && n2 ^ length(object) > 1e8) {
-    stop(
+    stop( #nocov start
       "Design would contain ", n2 ^ length(object),
       " objects. Rerun with force = TRUE to continue."
-    ) # nocov
+    ) #nocov end
   }
 
 
@@ -51,7 +47,7 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
 
   design <- expand.grid(rep(list(seq_len(n2)), length(object)))
   colnames(design) <- names(object)
-  design$Ranking <- NdRanking(as.matrix(design))
+  design$OriginalRanking <- NdRanking(as.matrix(design))
 
   for (i in seq_along(unified)) {
     if (inherits(object[[i]], "numeric")) {
@@ -65,6 +61,8 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
       design[, i] <- z[design[, i]]
     }
   }
+
+  design$Ranking <- rank(design$OriginalRanking)
 
   return(design)
 })
