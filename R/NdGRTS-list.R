@@ -42,7 +42,7 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     stop(
       "Design would contain ", n2 ^ length(object),
       " objects. Rerun with force = TRUE to continue."
-    )
+    ) # nocov
   }
 
   for (i in seq_along(object)) {
