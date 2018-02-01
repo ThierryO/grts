@@ -15,6 +15,10 @@ test_that("NdGRTS works on simple list", {
       anyDuplicated(result$Ranking),
       0L
     )
+    expect_identical(
+      anyDuplicated(result$OriginalRanking),
+      0L
+    )
   }
   test_dimension(basic, 1)
   test_dimension(basic, 2)
@@ -22,32 +26,17 @@ test_that("NdGRTS works on simple list", {
   test_dimension(basic, 4)
 })
 
-test_that("NdGRTS checks that the list contains only relevant types", {
-  expect_error(
-    NdGRTS(object = list()),
-    "object must contain at least one element"
-  )
-  expect_error(
-    NdGRTS(object = list(data.frame())),
-    "all elements of object must be numeric or integer"
-  )
-})
-
 test_that("NdGRTS handles optional arguments", {
   expect_is(
-    NdGRTS(list(X = 0:2, Y = 0:2), new.length = 1),
-    "data.frame"
-  )
-  expect_is(
-    NdGRTS(list(X = 0:2, Y = 0:2), force = FALSE),
-    "data.frame"
+    NdGRTS(data.frame(X = c(0, 1, 10), Y = 0:2), new.length = 5),
+    "list"
   )
   expect_error(
-    NdGRTS(list(X = 0:2, Y = 0:2), force = NA),
+    NdGRTS(data.frame(X = 0:2, Y = 0:2), force = NA),
     "force contains missing values"
   )
   expect_error(
-    NdGRTS(list(X = 0:2, Y = 0:2), force = 1),
+    NdGRTS(data.frame(X = 0:2, Y = 0:2), force = 1),
     "force is not a length one logical vector"
   )
 })
