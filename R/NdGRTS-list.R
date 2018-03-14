@@ -6,7 +6,7 @@
 #' @aliases NdGRTS
 #' @method NdGRTS list-method
 #' @importFrom methods setMethod
-#' @importFrom assertthat assert_that has_name is.flag
+#' @importFrom assertthat assert_that has_name is.flag is.string noNA
 #' @include NdGRTS.R
 setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
   assert_that(
@@ -19,10 +19,67 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
   )
   assert_that(!is.null(names(object)), msg = "object has no names")
 
+  dots <- list(...)
+  if (has_name(dots, "reference")) {
+    assert_that(
+      is.string(dots$reference),
+      msg = "reference must be a single character"
+    )
+    assert_that(
+      has_name(object, dots$reference),
+      msg = "reference must match a name in object"
+    )
+    assert_that(
+      has_name(dots, "scale"),
+      msg = "scale must be specified when specifying a reference"
+    )
+    assert_that(is.numeric(dots$scale), msg = "scale must be a numeric vector")
+    assert_that(noNA(dots$scale), msg = "scale cannot contain missing values")
+    assert_that(
+      all(dots$scale > 0),
+      msg = "scale must contain only strict positive values"
+    )
+    assert_that(!is.null(names(dots$scale)), msg = "scale must have names")
+    assert_that(
+      names(dots$scale) %in% names(object),
+      msg = "all names in scale must be present in object"
+    )
+    assert_that(
+      !any(dots$reference %in% names(dots$scale)),
+      msg = "scale contains reference"
+    )
+
+    object[names(dots$scale)] <- lapply(
+      names(dots$scale),
+      function(x) {
+        object[[x]] / dots$scale[x]
+      }
+    )
+
+    ref_range <- diff(range(object[[dots$reference]]))
+    scale_range <- sapply(
+      object[names(dots$scale)],
+      function(x){diff(range(x))}
+    )
+    if (ref_range < max(scale_range)) {
+      object[[dots$reference]] <- c(
+        object[[dots$reference]],
+        min(object[[dots$reference]]) +
+          (ref_range + c(-1, 1) * max(scale_range)) / 2
+      )
+      ref_range <- max(scale_range)
+    }
+    for (x in names(scale_range)[scale_range < ref_range]) {
+      object[[x]] <- c(
+        object[[x]],
+        min(object[[x]]) + (scale_range[x] + c(-1, 1) * ref_range) / 2
+      )
+    }
+  }
+
   # make all vectors to length 2^x
   n <- sapply(object, length)
   n2 <- max(2 ^ ceiling(log2(n)))
-  dots <- list(...)
   if (has_name(dots, "new.length")) {
     n2 <- max(n2, 2 ^ ceiling(log2(dots$new.length)))
   }
@@ -41,7 +98,6 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
       " objects. Rerun with force = TRUE to continue."
     ) #nocov end
   }
-
 
   unified <- lapply(object, unify_length, new.length = n2)
 
@@ -62,6 +118,11 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     }
   }
 
+  if (has_name(dots, "reference")) {
+    for (x in names(dots$scale)) {
+      design[, x] <- design[, x] * dots$scale[x]
+    }
+  }
   design$Ranking <- rank(design$OriginalRanking)
 
   return(design)
