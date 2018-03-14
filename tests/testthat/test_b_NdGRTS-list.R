@@ -39,4 +39,21 @@ test_that("NdGRTS handles optional arguments", {
     NdGRTS(data.frame(X = 0:2, Y = 0:2), force = 1),
     "force is not a length one logical vector"
   )
+  expect_is(
+    NdGRTS(
+      list(X = c(0, 1, 10), Y = 0:2),
+      reference = "Y",
+      scale = c(X = 2)
+    ),
+    "data.frame"
+  )
+  expect_is(
+    NdGRTS(
+      list(X = c(0, 1, 10), Y = 0:2),
+      reference = "X",
+      scale = c(Y = 1),
+      new.length = 9
+    ),
+    "data.frame"
+  )
 })
