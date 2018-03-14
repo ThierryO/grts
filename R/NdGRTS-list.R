@@ -10,6 +10,7 @@
 #' @include NdGRTS.R
 #' @details
 #' - `new.length` the new length of the unified vector. This will be rounded upwards to a power of 2.
+#' - `force` force the calculation of large designs
 #' - `reference` the name of the variable used as reference for the fixed aspect ratio
 #' - `scale` a named vector with the scales used of the fixed aspect ratio. `reference = "X"` and `scale = c(Y = 2)` will fixed aspect ratio so that `Y / X = 2`
 setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
@@ -22,6 +23,9 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     msg = "all elements of object must be numeric or integer"
   )
   assert_that(!is.null(names(object)), msg = "object has no names")
+  numerics <- sapply(object, inherits, "numeric")
+  longer <- rep(FALSE, length(object))
+  names(longer) <- names(object)
 
   dots <- list(...)
   if (has_name(dots, "reference")) {
@@ -72,12 +76,14 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
           (ref_range + c(-1, 1) * max(scale_range)) / 2
       )
       ref_range <- max(scale_range)
+      longer[dots$reference] <- TRUE
     }
     for (x in names(scale_range)[scale_range < ref_range]) {
       object[[x]] <- c(
         object[[x]],
         min(object[[x]]) + (scale_range[x] + c(-1, 1) * ref_range) / 2
       )
+      longer[x] <- TRUE
     }
   }
 
@@ -104,13 +110,21 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
   }
 
   unified <- lapply(object, unify_length, new.length = n2)
+  object[longer] <- lapply(object[longer], head, -2)
 
   design <- expand.grid(rep(list(seq_len(n2)), length(object)))
   colnames(design) <- names(object)
   design$OriginalRanking <- NdRanking(as.matrix(design))
 
+  if (has_name(dots, "reference")) {
+    for (x in names(dots$scale)) {
+      unified[[x]] <- unified[[x]] * dots$scale[x]
+      object[[x]] <- object[[x]] * dots$scale[x]
+    }
+  }
+
   for (i in seq_along(unified)) {
-    if (inherits(object[[i]], "numeric")) {
+    if (numerics[i]) {
       design[, i] <- unified[[i]][design[, i]]
     } else {
       distance <- abs(outer(unified[[i]], object[[i]], "-"))
@@ -122,11 +136,6 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     }
   }
 
-  if (has_name(dots, "reference")) {
-    for (x in names(dots$scale)) {
-      design[, x] <- design[, x] * dots$scale[x]
-    }
-  }
   design$Ranking <- rank(design$OriginalRanking)
 
   return(design)

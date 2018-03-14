@@ -32,11 +32,11 @@ test_that("NdGRTS handles optional arguments", {
     "list"
   )
   expect_error(
-    NdGRTS(data.frame(X = 0:2, Y = 0:2), force = NA),
+    NdGRTS(list(X = 0:2, Y = 0:2), force = NA),
     "force contains missing values"
   )
   expect_error(
-    NdGRTS(data.frame(X = 0:2, Y = 0:2), force = 1),
+    NdGRTS(list(X = 0:2, Y = 0:2), force = 1),
     "force is not a length one logical vector"
   )
   expect_is(

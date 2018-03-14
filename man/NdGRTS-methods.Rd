@@ -33,6 +33,7 @@ Optional arguments
 
 \itemize{
 \item \code{new.length} the new length of the unified vector. This will be rounded upwards to a power of 2.
+\item \code{force} force the calculation of large designs
 \item \code{reference} the name of the variable used as reference for the fixed aspect ratio
 \item \code{scale} a named vector with the scales used of the fixed aspect ratio. \code{reference = "X"} and \code{scale = c(Y = 2)} will fixed aspect ratio so that \code{Y / X = 2}
 }

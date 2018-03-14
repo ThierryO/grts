@@ -39,3 +39,25 @@ test_that("NdGRTS works on simple list", {
   test_dimension(basic, 3)
   test_dimension(basic, 4)
 })
+test_that("NdGRTS handles optional arguments", {
+  input <- data.frame(X = c(0, 1, 10), Y = 0:2)
+  expect_is(
+    output <- NdGRTS(
+      input,
+      reference = "Y",
+      scale = c(X = 2)
+    ),
+    "list"
+  )
+  expect_identical(nrow(input), nrow(output$object))
+  expect_is(
+    output <- NdGRTS(
+      input,
+      reference = "X",
+      scale = c(Y = 1),
+      new.length = 9
+    ),
+    "list"
+  )
+  expect_identical(nrow(input), nrow(output$object))
+})
