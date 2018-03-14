@@ -8,6 +8,10 @@
 #' @importFrom methods setMethod
 #' @importFrom assertthat assert_that has_name is.flag is.string noNA
 #' @include NdGRTS.R
+#' @details
+#' - `new.length` the new length of the unified vector. This will be rounded upwards to a power of 2.
+#' - `reference` the name of the variable used as reference for the fixed aspect ratio
+#' - `scale` a named vector with the scales used of the fixed aspect ratio. `reference = "X"` and `scale = c(Y = 2)` will fixed aspect ratio so that `Y / X = 2`
 setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
   assert_that(
     length(object) > 0,

@@ -20,12 +20,21 @@ NdGRTS(object, ...)
 \arguments{
 \item{object}{The object on which to generate the N dimensional GRTS ranking}
 
-\item{...}{further arguments to the functions}
+\item{...}{further arguments to the functions. See Details}
 }
 \value{
 a data.frame with the design and ranking
 }
 \description{
 While GRTS() works only on 2 dimensional data, NdGRTS() can work with several dimensions, starting from 1.
+}
+\details{
+Optional arguments
+
+\itemize{
+\item \code{new.length} the new length of the unified vector. This will be rounded upwards to a power of 2.
+\item \code{reference} the name of the variable used as reference for the fixed aspect ratio
+\item \code{scale} a named vector with the scales used of the fixed aspect ratio. \code{reference = "X"} and \code{scale = c(Y = 2)} will fixed aspect ratio so that \code{Y / X = 2}
+}
 }
 \keyword{methods}
