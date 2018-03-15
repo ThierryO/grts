@@ -16,6 +16,7 @@ Depends:
   methods
 Imports: 
   assertthat,
+  dplyr,
   sp, 
   spatstat, 
   RODBC
@@ -40,6 +41,7 @@ Collate:
     'NdGRTS.R'
     'NdGRTS-list.R'
     'NdGRTS-data_frame.R'
+    'NdGRTS-spatialpoints.R'
     'NdRanking.R'
     'QuadratRanking.R'
     'halton.R'
