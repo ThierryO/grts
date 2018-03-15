@@ -6,8 +6,8 @@
 #' @aliases NdGRTS
 #' @method NdGRTS SpatialPoints-method
 #' @importFrom methods setMethod
-#' @importFrom assertthat has_name assert_that is.number
-#' @importFrom dplyr %>%
+#' @importFrom assertthat has_name assert_that noNA
+#' @importFrom dplyr %>% mutate_at
 #' @importFrom sp coordinates SpatialPixelsDataFrame fullgrid<- over SpatialPointsDataFrame
 #' @importFrom spatstat as.ppp as.ppp.matrix as.ppp.data.frame owin nndist
 #' @importFrom stats setNames
@@ -17,22 +17,33 @@
 setMethod("NdGRTS", signature(object = "SpatialPoints"), function(object, ...) {
   dots <- list(...)
   if (has_name(dots, "reference")) {
-    warning("the aspect ratio is current fixed to 1 on SpatialPoints")
+    warning("the first coordinate is used as reference")
+  }
+  if (has_name(dots, "scale")) {
+    warning("scale is ignored with SpatialPoints. use cellsize instead")
   }
   if (has_name(dots, "cellsize")) {
+    assert_that(is.numeric(dots$cellsize), msg = "cellsize must be numeric")
     assert_that(
-      is.number(dots$cellsize),
-      msg = "cellsize must be a single number"
+      noNA(dots$cellsize),
+      msg = "cellsize cannot contain missing values"
     )
-    assert_that(dots$cellsize > 0, msg = "cellsize must be strict positive")
+    assert_that(length(dots$cellsize) == 2, msg = "cellsize must be length 2")
+    assert_that(
+      all(dots$cellsize > 0),
+      msg = "cellsize must be strict positive"
+    )
   } else {
     object %>%
       coordinates() %>%
       as.ppp(owin(xrange = bbox(object)[1, ], yrange = bbox(object)[2, ])) %>%
       nndist() %>%
       min() %>%
-      "/"(3) -> dots$cellsize
+      "/"(3) %>%
+      rep(2) -> dots$cellsize
   }
+  the_names <- rownames(bbox(object))
+  ratio <- dots$cellsize / dots$cellsize[1]
   bbox(object) %>%
     apply(1, diff) %>%
     "/"(dots$cellsize) %>%
@@ -42,15 +53,18 @@ setMethod("NdGRTS", signature(object = "SpatialPoints"), function(object, ...) {
   seq_len(2 ^ levels) %>%
     scale(scale = FALSE) %>%
     as.vector() %>%
-    "*"(dots$cellsize) %>%
-    outer(rowMeans(bbox(object)), "+") %>%
+    outer(X = dots$cellsize, "*") %>%
+    '+'(rowMeans(bbox(object))) %>%
+    '/'(ratio) %>%
+    t() %>%
     as.data.frame() %>%
+    setNames(the_names) %>%
     as.list() %>%
     NdGRTS(
-      reference = rownames(bbox(object))[1],
-      scale = setNames(1, rownames(bbox(object))[2]),
-      ...
-    ) -> output
+      reference = the_names[1],
+      scale = setNames(1, the_names[2])
+    ) %>%
+    mutate_at(the_names[2], function(x){x * ratio[2]}) -> output
   grid <- SpatialPixelsDataFrame(
     points = output[, 1:2],
     data = output[, 3:4],

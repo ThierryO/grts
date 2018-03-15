@@ -7,6 +7,8 @@
 #' @method NdGRTS list-method
 #' @importFrom methods setMethod
 #' @importFrom assertthat assert_that has_name is.flag is.string noNA
+#' @importFrom dplyr %>%
+#' @importFrom stats setNames
 #' @include NdGRTS.R
 #' @details
 #' - `new.length` the new length of the unified vector. This will be rounded upwards to a power of 2.
@@ -24,8 +26,8 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
   )
   assert_that(!is.null(names(object)), msg = "object has no names")
   numerics <- sapply(object, inherits, "numeric")
-  longer <- rep(FALSE, length(object))
-  names(longer) <- names(object)
+  rep(FALSE, length(object)) %>%
+    setNames(names(object)) -> longer
 
   dots <- list(...)
   if (has_name(dots, "reference")) {
