@@ -1,22 +1,22 @@
-context("NdGRTS on lists")
-test_that("NdGRTS works on simple list", {
+context("nd_grts on lists")
+test_that("nd_grts works on simple list", {
   # simple lists = only vectors of same length which is power of 2
   basic <- list(X = c(0, 1, 2, 3), Y = 0:1, Z = 0:3, A = 0:4)
   test_dimension <- function(basic, n){
     expect_is(
-      result <- NdGRTS(basic[seq_len(n)]),
+      result <- nd_grts(basic[seq_len(n)]),
       "data.frame"
     )
     expect_identical(
       names(result),
-      c(names(basic)[seq_len(n)], "OriginalRanking", "Ranking")
+      c(names(basic)[seq_len(n)], "original_ranking", "ranking")
     )
     expect_identical(
-      anyDuplicated(result$Ranking),
+      anyDuplicated(result$ranking),
       0L
     )
     expect_identical(
-      anyDuplicated(result$OriginalRanking),
+      anyDuplicated(result$original_ranking),
       0L
     )
   }
@@ -26,21 +26,21 @@ test_that("NdGRTS works on simple list", {
   test_dimension(basic, 4)
 })
 
-test_that("NdGRTS handles optional arguments", {
+test_that("nd_grts handles optional arguments", {
   expect_is(
-    NdGRTS(data.frame(X = c(0, 1, 10), Y = 0:2), new.length = 5),
+    nd_grts(data.frame(X = c(0, 1, 10), Y = 0:2), new.length = 5),
     "list"
   )
   expect_error(
-    NdGRTS(list(X = 0:2, Y = 0:2), force = NA),
+    nd_grts(list(X = 0:2, Y = 0:2), force = NA),
     "force contains missing values"
   )
   expect_error(
-    NdGRTS(list(X = 0:2, Y = 0:2), force = 1),
+    nd_grts(list(X = 0:2, Y = 0:2), force = 1),
     "force is not a length one logical vector"
   )
   expect_is(
-    NdGRTS(
+    nd_grts(
       list(X = c(0, 1, 10), Y = 0:2),
       reference = "Y",
       scale = c(X = 2)
@@ -48,7 +48,7 @@ test_that("NdGRTS handles optional arguments", {
     "data.frame"
   )
   expect_is(
-    NdGRTS(
+    nd_grts(
       list(X = c(0, 1, 10), Y = 0:2),
       reference = "X",
       scale = c(Y = 1),

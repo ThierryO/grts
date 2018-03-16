@@ -1,0 +1,1 @@
+exclusions: list("R/GRTSaccess.R", "R/GRTSODBC.R", "R/GRTSgrid.R", "R/GRTSpoints.R", "R/GRTSpolygons.R", "R/GRTS.R", "R/QuadratRanking.R")

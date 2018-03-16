@@ -10,8 +10,12 @@ vanderCorput <- function(
   base = 2,
   start
   ){
-  if(missing(start)){
-    start <- sample.int(n = .Machine$integer.max - size, size = 1, replace = TRUE)
+  if (missing(start)) {
+    start <- sample.int(
+      n = .Machine$integer.max - size,
+      size = 1,
+      replace = TRUE
+    )
   }
   digits <- ceiling(log(start + size, base))
   p <- base ^ (seq_len(digits + 1) - 1)
@@ -21,7 +25,7 @@ vanderCorput <- function(
       sequence = sapply(
         n,
         function(n){
-          lambda <- floor((n / head(p, -1))  %% base)
+          lambda <- floor( (n / head(p, -1))  %% base)
           sum(lambda / tail(p, -1))
         }
       ),
@@ -45,16 +49,22 @@ vanderCorput <- function(
 #' points(halton(size = 100)$coordinates, col = "blue")
 
 halton <- function(size, dim = 2, start){
-  primes <- c(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293)
-  if(missing(start)){
+  primes <- c(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
+    61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
+    149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227,
+    229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293)
+  if (missing(start)) {
     start <- sample.int(.Machine$integer.max - size, size = dim, replace = TRUE)
   } else {
-    if(length(start) != dim){
+    if (length(start) != dim) {
       stop("The length of start should be equal to dim.")
     }
   }
-  if(length(primes) < dim){
-    stop("Halton sequences currently only available for maximum ", length(primes), " dimensions.")
+  if (length(primes) < dim) {
+    stop(
+      "Halton sequences currently only available for maximum ",
+      length(primes), " dimensions."
+    )
   }
   base <- sample(head(primes, dim))
   coordinates <- sapply(

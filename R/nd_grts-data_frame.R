@@ -1,13 +1,13 @@
 #' @export
-#' @name NdGRTS-methods
+#' @name nd_grts-methods
 #' @docType methods
-#' @rdname NdGRTS-methods
-#' @aliases NdGRTS,data.frame-method
-#' @aliases NdGRTS
-#' @method NdGRTS data.frame-method
+#' @rdname nd_grts-methods
+#' @aliases nd_grts,data.frame-method
+#' @aliases nd_grts
+#' @method nd_grts data.frame-method
 #' @importFrom methods setMethod
-#' @include NdGRTS-list.R
-setMethod("NdGRTS", signature(object = "data.frame"), function(object, ...) {
+#' @include nd_grts-list.R
+setMethod("nd_grts", signature(object = "data.frame"), function(object, ...) {
   object_list <- lapply(object, unique)
   for (i in which(sapply(object_list, is.integer))) {
     object_list[[i]] <- min(object_list[[i]]):max(object_list[[i]])
@@ -21,7 +21,7 @@ setMethod("NdGRTS", signature(object = "data.frame"), function(object, ...) {
     attr(object_list[[i]], "levels") <- this_level
   }
 
-  design <- NdGRTS(object_list, ...)
+  design <- nd_grts(object_list, ...)
   level <- lapply(object_list, attr, "levels")
   for (i in names(level)[!sapply(level, is.null)]) {
     design[, i] <- factor(design[, i], labels = level[[i]])
@@ -31,7 +31,7 @@ setMethod("NdGRTS", signature(object = "data.frame"), function(object, ...) {
     object[, i] <- d[cut(object[, i], breaks = c(-Inf, d))]
   }
   object <- merge(object, design)
-  object$Ranking <- rank(object$OriginalRanking)
+  object$ranking <- rank(object$original_ranking)
 
   return(list(object = object, design = design))
 })

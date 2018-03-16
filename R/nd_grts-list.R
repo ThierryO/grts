@@ -1,21 +1,21 @@
 #' @export
-#' @name NdGRTS-methods
+#' @name nd_grts-methods
 #' @docType methods
-#' @rdname NdGRTS-methods
-#' @aliases NdGRTS,list-method
-#' @aliases NdGRTS
-#' @method NdGRTS list-method
+#' @rdname nd_grts-methods
+#' @aliases nd_grts,list-method
+#' @aliases nd_grts
+#' @method nd_grts list-method
 #' @importFrom methods setMethod
 #' @importFrom assertthat assert_that has_name is.flag is.string noNA
 #' @importFrom dplyr %>%
 #' @importFrom stats setNames
-#' @include NdGRTS.R
+#' @include nd_grts.R
 #' @details
 #' - `new.length` the new length of the unified vector. This will be rounded upwards to a power of 2.
 #' - `force` force the calculation of large designs
 #' - `reference` the name of the variable used as reference for the fixed aspect ratio
 #' - `scale` a named vector with the scales used of the fixed aspect ratio. `reference = "X"` and `scale = c(Y = 2)` will fixed aspect ratio so that `Y / X = 2`
-setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
+setMethod("nd_grts", signature(object = "list"), function(object, ...) {
   assert_that(
     length(object) > 0,
     msg = "object must contain at least one element"
@@ -44,7 +44,7 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
       msg = "scale must be specified when specifying a reference"
     )
     assert_that(is.numeric(dots$scale), msg = "scale must be a numeric vector")
-    assert_that(noNA(dots$scale), msg = "scale cannot contain missing values")
+    assert_that(noNA(dots$scale), msg = "scale cannot contain missing values") #nolint
     assert_that(
       all(dots$scale > 0),
       msg = "scale must contain only strict positive values"
@@ -69,7 +69,9 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     ref_range <- diff(range(object[[dots$reference]]))
     scale_range <- sapply(
       object[names(dots$scale)],
-      function(x){diff(range(x))}
+      function(x){
+        diff(range(x))
+      }
     )
     if (ref_range < max(scale_range)) {
       object[[dots$reference]] <- c(
@@ -100,7 +102,7 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
       is.flag(dots$force),
       msg = "force is not a length one logical vector"
     )
-    assert_that(noNA(dots$force), msg = "force contains missing values")
+    assert_that(noNA(dots$force), msg = "force contains missing values") #nolint
   } else {
     dots$force <- FALSE
   }
@@ -116,7 +118,7 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
 
   design <- expand.grid(rep(list(seq_len(n2)), length(object)))
   colnames(design) <- names(object)
-  design$OriginalRanking <- NdRanking(as.matrix(design))
+  design$original_ranking <- nd_ranking(as.matrix(design))
 
   if (has_name(dots, "reference")) {
     for (x in names(dots$scale)) {
@@ -138,7 +140,7 @@ setMethod("NdGRTS", signature(object = "list"), function(object, ...) {
     }
   }
 
-  design$Ranking <- rank(design$OriginalRanking)
+  design$ranking <- rank(design$original_ranking) - 1
 
   return(design)
 })

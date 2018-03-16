@@ -1,11 +1,11 @@
-context("NdRanking")
-test_that("NdRanking works with different levels and dimensions", {
+context("nd_ranking")
+test_that("nd_ranking works with different levels and dimensions", {
   design <- function(level, n_var){
     as.matrix(
       expand.grid(
         rep(
           list(
-            seq_len(2^(level + 1)) - 1
+            seq_len(2 ^ (level + 1)) - 1
           ),
           n_var
         )
@@ -14,7 +14,7 @@ test_that("NdRanking works with different levels and dimensions", {
   }
   test_design <- function(level, n_var){
     expect_is(
-      ranking <- NdRanking(design(level, n_var)),
+      ranking <- nd_ranking(design(level, n_var)),
       "numeric"
     )
     expect_equal(

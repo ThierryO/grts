@@ -13,7 +13,7 @@ setMethod("unify_length", signature(x = "numeric"), function(x, new.length) {
   assert_that(is.count(new.length))
   assert_that(length(x) <= new.length)
   assert_that(anyDuplicated(x) == 0, msg = "vector contains duplicate values")
-  assert_that(noNA(x))
+  assert_that(noNA(x)) #nolint
 
   step <- diff(range(x)) / (new.length - 1)
   if (anyDuplicated(round(x / step))) {
