@@ -51,7 +51,7 @@ setMethod("nd_grts", signature(object = "list"), function(object, ...) {
     )
     assert_that(!is.null(names(dots$scale)), msg = "scale must have names")
     assert_that(
-      names(dots$scale) %in% names(object),
+      all(names(dots$scale) %in% names(object)),
       msg = "all names in scale must be present in object"
     )
     assert_that(

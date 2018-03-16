@@ -33,6 +33,13 @@ setMethod(
       max() %>%
       log2() %>%
       ceiling() -> levels
+    if (has_name(dots, "scale")) {
+      if (any(names(dots$scale) %in% the_names)) {
+        dots$scale <- dots$scale[!names(dots$scale) %in% the_names]
+      }
+    } else {
+      dots$scale <- numeric(0)
+    }
     seq_len(2 ^ levels) %>%
       scale(scale = FALSE) %>%
       as.vector() %>%
@@ -49,7 +56,7 @@ setMethod(
       ) %>%
       nd_grts(
         reference = the_names[1],
-        scale = setNames(1, the_names[2])
+        scale = c(setNames(1, the_names[2]), dots$scale)
       ) %>%
       mutate_at(
         the_names[2],

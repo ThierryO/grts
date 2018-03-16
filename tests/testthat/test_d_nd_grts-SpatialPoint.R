@@ -14,6 +14,10 @@ test_that("nd_grts works on SpatialPoints", {
     length(unique(output$object$original_ranking)),
     nrow(unique(output$object@data))
   )
+  expect_identical(
+    length(unique(output$design$original_ranking)),
+    nrow(unique(output$design@data))
+  )
 
   cellsize <- c(0.1, 0.2)
   expect_is(output <- nd_grts(object, cellsize = cellsize), "list")
@@ -22,12 +26,24 @@ test_that("nd_grts works on SpatialPoints", {
     length(unique(output$object$original_ranking)),
     nrow(unique(output$object@data))
   )
+  expect_identical(
+    length(unique(output$design$original_ranking)),
+    nrow(unique(output$design@data))
+  )
 
   cellsize <- c(0.5, 0.5)
   expect_is(output <- nd_grts(object, cellsize = cellsize), "list")
   expect_identical(
     length(unique(output$object$original_ranking)),
     nrow(unique(output$object@data))
+  )
+  expect_identical(
+    length(unique(output$design$original_ranking)),
+    nrow(unique(output$design@data))
+  )
+  expect_identical(
+    length(unique(output$design$ranking)),
+    nrow(unique(output$design@data))
   )
 
   expect_warning(nd_grts(object, reference = "Y"))
@@ -54,11 +70,32 @@ test_that("nd_grts works on SpatialPointsDataFrame", {
     length(unique(output$object$original_ranking)),
     nrow(unique(output$object@data[, c("original_ranking", "ranking")]))
   )
+  expect_identical(
+    length(unique(output$design$original_ranking)),
+    nrow(unique(output$design[, c("original_ranking", "ranking")]))
+  )
 
   expect_is(output <- nd_grts(object, cellsize = c(2, 2)), "list")
   expect_identical(
     length(unique(output$object$original_ranking)),
     nrow(unique(output$object@data[, c("original_ranking", "ranking")]))
+  )
+  expect_identical(
+    length(unique(output$design$original_ranking)),
+    nrow(unique(output$design[, c("original_ranking", "ranking")]))
+  )
+
+  expect_is(
+    output <- nd_grts(object, cellsize = c(1, 1), scale = c(A = 1)),
+    "list"
+  )
+  expect_identical(
+    length(unique(output$object$original_ranking)),
+    nrow(unique(output$object@data[, c("original_ranking", "ranking")]))
+  )
+  expect_identical(
+    length(unique(output$design$original_ranking)),
+    nrow(unique(output$design[, c("original_ranking", "ranking")]))
   )
 
   expect_warning(nd_grts(object, reference = "Y"))
