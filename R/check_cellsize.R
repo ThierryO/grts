@@ -10,6 +10,7 @@ check_cellsize <- function(object, cellsize) {
   if (missing(cellsize)) {
     object %>%
       coordinates() %>%
+      unique() %>%
       as.ppp(owin(xrange = bbox(object)[1, ], yrange = bbox(object)[2, ])) %>%
       nndist() %>%
       min() %>%
