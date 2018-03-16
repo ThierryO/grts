@@ -17,58 +17,58 @@
 setMethod(
   "nd_grts",
   signature(object = "SpatialPoints"),
-  function(object, ...)
-{
-  dots <- list(...)
-  if (has_name(dots, "reference")) {
-    warning("the first coordinate is used as reference")
-  }
-  if (has_name(dots, "scale")) {
-    warning("scale is ignored with SpatialPoints. use cellsize instead")
-  }
-  if (has_name(dots, "cellsize")) {
-    dots$cellsize <- check_cellsize(object, dots$cellsize)
-  } else {
-    dots$cellsize <- check_cellsize(object)
-  }
-  the_names <- rownames(bbox(object))
-  ratio <- dots$cellsize / dots$cellsize[1]
-  bbox(object) %>%
-    apply(1, diff) %>%
-    `/`(dots$cellsize) %>%
-    max() %>%
-    log2() %>%
-    ceiling() -> levels
-  seq_len(2 ^ levels) %>%
-    scale(scale = FALSE) %>%
-    as.vector() %>%
-    outer(X = dots$cellsize, "*") %>%
-    `+`(rowMeans(bbox(object))) %>%
-    `/`(ratio) %>%
-    t() %>%
-    as.data.frame() %>%
-    setNames(the_names) %>%
-    as.list() %>%
-    nd_grts(
-      reference = the_names[1],
-      scale = setNames(1, the_names[2])
+  function(object, ...) {
+    dots <- list(...)
+    if (has_name(dots, "reference")) {
+      warning("the first coordinate is used as reference")
+    }
+    if (has_name(dots, "scale")) {
+      warning("scale is ignored with SpatialPoints. use cellsize instead")
+    }
+    if (has_name(dots, "cellsize")) {
+      dots$cellsize <- check_cellsize(object, dots$cellsize)
+    } else {
+      dots$cellsize <- check_cellsize(object)
+    }
+    the_names <- rownames(bbox(object))
+    ratio <- dots$cellsize / dots$cellsize[1]
+    bbox(object) %>%
+      apply(1, diff) %>%
+      `/`(dots$cellsize) %>%
+      max() %>%
+      log2() %>%
+      ceiling() -> levels
+    seq_len(2 ^ levels) %>%
+      scale(scale = FALSE) %>%
+      as.vector() %>%
+      outer(X = dots$cellsize, "*") %>%
+      `+`(rowMeans(bbox(object))) %>%
+      `/`(ratio) %>%
+      t() %>%
+      as.data.frame() %>%
+      setNames(the_names) %>%
+      as.list() %>%
+      nd_grts(
+        reference = the_names[1],
+        scale = setNames(1, the_names[2])
+      ) %>%
+      mutate_at(
+        the_names[2],
+        function(x){
+          x * ratio[2]
+        }
+      ) -> output
+    grid <- SpatialPixelsDataFrame( #nolint
+      points = output[, 1:2],
+      data = output[, 3:4],
+      proj4string = object@proj4string
     ) %>%
-    mutate_at(
-      the_names[2],
-      function(x){
-        x * ratio[2]
-      }
-    ) -> output
-  grid <- SpatialPixelsDataFrame( #nolint
-    points = output[, 1:2],
-    data = output[, 3:4],
-    proj4string = object@proj4string
-  ) %>%
-    `fullgrid<-`(TRUE)
-  set <- SpatialPointsDataFrame( #nolint
-    object,
-    data = over(object, grid)
-  )
-  set$ranking <- rank(set$original_ranking)
-  return(list(object = set, design = grid))
-})
+      `fullgrid<-`(TRUE)
+    set <- SpatialPointsDataFrame( #nolint
+      object,
+      data = over(object, grid)
+    )
+    set$ranking <- rank(set$original_ranking)
+    return(list(object = set, design = grid))
+  }
+)
