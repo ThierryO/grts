@@ -43,7 +43,7 @@ Optional arguments
 }
 
 \itemize{
-\item \code{cellsize} the cellsize for the spatial grid. Defaults to one thirth the minimum distance between nearest neighbours
+\item \code{cellsize} the cellsize for the spatial grid. Defaults to one thirth of the minimum distance between nearest neighbours
 }
 }
 \keyword{methods}

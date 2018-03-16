@@ -11,9 +11,9 @@
 #' @importFrom sp coordinates SpatialPixelsDataFrame fullgrid<- over SpatialPointsDataFrame
 #' @importFrom spatstat as.ppp as.ppp.matrix as.ppp.data.frame owin nndist
 #' @importFrom stats setNames
-#' @include NdGRTS-data_frame.R
+#' @include NdGRTS-list.R
 #' @details
-#' - `cellsize` the cellsize for the spatial grid. Defaults to one thirth the minimum distance between nearest neighbours
+#' - `cellsize` the cellsize for the spatial grid. Defaults to one thirth of the minimum distance between nearest neighbours
 setMethod("NdGRTS", signature(object = "SpatialPoints"), function(object, ...) {
   dots <- list(...)
   if (has_name(dots, "reference")) {
