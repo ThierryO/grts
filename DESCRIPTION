@@ -44,6 +44,7 @@ Collate:
     'NdGRTS-spatialpoints.R'
     'NdRanking.R'
     'QuadratRanking.R'
+    'check_cellsize.R'
     'halton.R'
     'unify_length.R'
     'unify_length-integer.R'
