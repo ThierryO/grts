@@ -2,28 +2,23 @@
 #' @name nd_grts-methods
 #' @docType methods
 #' @rdname nd_grts-methods
-#' @aliases nd_grts,SpatialPoints-method
+#' @aliases nd_grts,SpatialPointsDataFrame-method
 #' @aliases nd_grts
-#' @method nd_grts SpatialPoints-method
+#' @method nd_grts SpatialPointsDataFrame-method
 #' @importFrom methods setMethod
-#' @importFrom assertthat has_name assert_that noNA
-#' @importFrom dplyr %>% mutate_at distinct inner_join
-#' @importFrom sp coordinates SpatialPixelsDataFrame fullgrid<- over SpatialPointsDataFrame
-#' @importFrom spatstat as.ppp as.ppp.matrix as.ppp.data.frame owin nndist
+#' @importFrom assertthat has_name assert_that
+#' @importFrom sp bbox over SpatialPointsDataFrame coordinates SpatialPixelsDataFrame fullgrid<-
+#' @importFrom dplyr %>% mutate inner_join select bind_cols mutate_at distinct
+#' @importFrom rlang .data
 #' @importFrom stats setNames
 #' @include nd_grts-list.R
-#' @details
-#' - `cellsize` the cellsize for the spatial grid. Defaults to one thirth of the minimum distance between nearest neighbours
 setMethod(
   "nd_grts",
-  signature(object = "SpatialPoints"),
+  signature(object = "SpatialPointsDataFrame"),
   function(object, ...) {
     dots <- list(...)
     if (has_name(dots, "reference")) {
       warning("the first coordinate is used as reference")
-    }
-    if (has_name(dots, "scale")) {
-      warning("scale is ignored with SpatialPoints. use cellsize instead")
     }
     if (has_name(dots, "cellsize")) {
       dots$cellsize <- check_cellsize(object, dots$cellsize)
@@ -48,6 +43,10 @@ setMethod(
       as.data.frame() %>%
       setNames(the_names) %>%
       as.list() %>%
+      c(
+        object@data %>%
+          lapply(unique)
+      ) %>%
       nd_grts(
         reference = the_names[1],
         scale = setNames(1, the_names[2])
@@ -58,20 +57,30 @@ setMethod(
           x * ratio[2]
         }
       ) -> output
+    id <- paste0("id", as.integer(Sys.time()))
+    output[, id] <- seq_len(nrow(output))
     grid <- SpatialPixelsDataFrame( #nolint
       points = output[, the_names],
-      data = output[, c("original_ranking", "ranking")],
+      data = output[id],
       proj4string = object@proj4string
     ) %>%
       `fullgrid<-`(TRUE)
-    set <- SpatialPointsDataFrame( #nolint
-      object,
-      data = over(object, grid["original_ranking"])
-    )
+    grid %>%
+      over(x = object) %>%
+      inner_join(
+        output %>%
+          select(c(id, the_names)),
+        by = id
+      ) %>%
+      select(-1) %>%
+      bind_cols(object@data) %>%
+      inner_join(output, by = c(the_names, colnames(object@data))) %>%
+      select("original_ranking") %>%
+      SpatialPointsDataFrame(coords = coordinates(object)) -> set
     set@data %>%
       distinct(.data$original_ranking) %>%
       mutate(ranking = rank(.data$original_ranking)) %>%
       inner_join(x = set@data, by = "original_ranking") -> set@data
-    return(list(object = set, design = grid))
+    return(list(object = set, design = output[names(output) != id]))
   }
 )
