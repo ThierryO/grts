@@ -28,8 +28,8 @@ test_that("nd_grts works on simple list", {
 
 test_that("nd_grts handles optional arguments", {
   expect_is(
-    nd_grts(data.frame(X = c(0, 1, 10), Y = 0:2), new.length = 5),
-    "list"
+    nd_grts(list(X = c(0, 1, 10), Y = 0:2), new.length = 5),
+    "data.frame"
   )
   expect_error(
     nd_grts(list(X = 0:2, Y = 0:2), force = NA),

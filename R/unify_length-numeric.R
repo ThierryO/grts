@@ -7,6 +7,7 @@
 #' @method unify_length numeric-method
 #' @importFrom methods setMethod
 #' @importFrom assertthat assert_that is.count noNA
+#' @importFrom dplyr %>%
 #' @include unify_length.R
 setMethod("unify_length", signature(x = "numeric"), function(x, new.length) {
   assert_that(is.vector(x))
@@ -16,8 +17,13 @@ setMethod("unify_length", signature(x = "numeric"), function(x, new.length) {
   assert_that(noNA(x)) #nolint
 
   step <- diff(range(x)) / (new.length - 1)
-  if (anyDuplicated(round(x / step))) {
+  output <- seq(min(x), max(x), length = new.length)
+  outer(output, x, "-") %>%
+    abs() %>%
+    apply(2, which.min) %>%
+    anyDuplicated() -> check
+  if (check) {
     stop("Current new.length = ", new.length, " is too small")
   }
-  return(seq(min(x), max(x), length = new.length))
+  return(output)
 })

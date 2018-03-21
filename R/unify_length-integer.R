@@ -6,7 +6,6 @@
 #' @aliases unify_length
 #' @method unify_length integer-method
 #' @importFrom methods setMethod
-#' @importFrom assertthat assert_that is.count noNA
 #' @include unify_length.R
 setMethod("unify_length", signature(x = "integer"), function(x, new.length) {
   return(unify_length(x = as.numeric(x), new.length = new.length))
