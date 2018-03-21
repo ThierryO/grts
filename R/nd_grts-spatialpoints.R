@@ -8,8 +8,7 @@
 #' @importFrom methods setMethod
 #' @importFrom assertthat has_name assert_that noNA
 #' @importFrom dplyr %>% mutate_at distinct inner_join
-#' @importFrom sp coordinates SpatialPixelsDataFrame fullgrid<- over SpatialPointsDataFrame
-#' @importFrom spatstat as.ppp as.ppp.matrix as.ppp.data.frame owin nndist
+#' @importFrom sp SpatialPixelsDataFrame fullgrid<- over SpatialPointsDataFrame
 #' @importFrom stats setNames
 #' @include nd_grts-list.R
 #' @details

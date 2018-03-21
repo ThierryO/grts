@@ -86,7 +86,7 @@ test_that("nd_grts works on SpatialPointsDataFrame", {
   )
 
   expect_is(
-    output <- nd_grts(object, cellsize = c(1, 1), scale = c(A = 1)),
+    output <- nd_grts(object, cellsize = c(1, 1), scale = c(X = 1, A = 1)),
     "list"
   )
   expect_identical(
