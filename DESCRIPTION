@@ -47,6 +47,7 @@ Collate:
     'nd_grts-data_frame.R'
     'nd_grts-spatialpoints.R'
     'nd_grts-spatialpointsdataframe.R'
+    'nd_grts-spatialpolygons.R'
     'nd_ranking.R'
     'unify_length.R'
     'unify_length-integer.R'

@@ -6,7 +6,7 @@ test_that("nd_grts works on SpatialPoints", {
 
   object <- SpatialPoints(cbind(x = runif(n), y = runif(n, max = 2))) #nolint
   expect_is(output <- nd_grts(object), "list")
-  expect_identical(names(output), c("object", "design"))
+  expect_named(output, c("object", "design"))
   expect_is(output$object, "SpatialPointsDataFrame")
   expect_identical(length(output$object), length(object))
   expect_is(output$design, "SpatialGridDataFrame")
@@ -62,7 +62,7 @@ test_that("nd_grts works on SpatialPointsDataFrame", {
     data = data.frame(A = sample(0:1, n, replace = TRUE))
   )
   expect_is(output <- nd_grts(object), "list")
-  expect_identical(names(output), c("object", "design"))
+  expect_named(output, c("object", "design"))
   expect_is(output$object, "SpatialPointsDataFrame")
   expect_identical(length(output$object), length(object))
   expect_is(output$design, "data.frame")
