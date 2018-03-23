@@ -62,7 +62,7 @@ setMethod(
     set <- grid[!is.na(over(grid, object)), "original_ranking"]
     set@data %>%
       distinct(.data$original_ranking) %>%
-      mutate(ranking = rank(.data$original_ranking)) %>%
+      mutate(ranking = rank(.data$original_ranking) - 1) %>%
       inner_join(x = set@data, by = "original_ranking") -> set@data
     fullgrid(grid) <- TRUE
     return(list(object = set, design = grid))

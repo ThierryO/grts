@@ -53,3 +53,4 @@ Collate:
     'unify_length.R'
     'unify_length-integer.R'
     'unify_length-numeric.R'
+    'utils.R'

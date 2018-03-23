@@ -31,7 +31,7 @@ setMethod("nd_grts", signature(object = "data.frame"), function(object, ...) {
     object[, i] <- d[cut(object[, i], breaks = c(-Inf, d))]
   }
   object <- merge(object, design)
-  object$ranking <- rank(object$original_ranking)
+  object$ranking <- rank(object$original_ranking) - 1
 
   return(list(object = object, design = design))
 })

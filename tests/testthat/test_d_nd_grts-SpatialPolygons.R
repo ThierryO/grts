@@ -47,7 +47,7 @@ test_that("nd_grts works on SpatialPolygonsDataFrame", {
     Polygons(list(Polygon(cbind(2 + c(0, 1, 1, 0), 2 + c(0, 0, 1, 0)))), ID = 4)
   ) %>%
     SpatialPolygons() %>%
-    SpatialPolygonsDataFrame(data.frame(A = c(0, 0, 1, 1)))
+    SpatialPolygonsDataFrame(data.frame(A = c(0L, 0L, 1L, 1L)))
   cellsize <- c(0.5, 0.5)
   expect_is(
     output <- nd_grts(object, cellsize = cellsize),
@@ -100,5 +100,9 @@ test_that("nd_grts works on SpatialPolygonsDataFrame", {
   )
   expect_warning(
     nd_grts(object, cellsize = cellsize, reference = "x")
+  )
+  expect_is(
+    output <- nd_grts(object, cellsize = cellsize, scale = c(A = 1)),
+    "list"
   )
 })

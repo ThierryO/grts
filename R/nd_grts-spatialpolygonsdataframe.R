@@ -7,7 +7,7 @@
 #' @method nd_grts SpatialPolygonsDataFrame-method
 #' @importFrom methods setMethod
 #' @importFrom assertthat has_name assert_that
-#' @importFrom sp bbox over SpatialPointsDataFrame coordinates
+#' @importFrom sp bbox over SpatialPoints SpatialPointsDataFrame coordinates
 #' @importFrom dplyr %>% mutate inner_join select bind_cols mutate_at distinct select_at
 #' @importFrom rlang .data
 #' @importFrom stats setNames
@@ -33,6 +33,7 @@ setMethod(
       max() %>%
       log2() %>%
       ceiling() -> levels
+    classes <- sapply(object@data, class)
     if (has_name(dots, "scale")) {
       if (any(names(dots$scale) %in% the_names)) {
         dots$scale <- dots$scale[!names(dots$scale) %in% the_names]
@@ -64,6 +65,9 @@ setMethod(
           x * ratio[2]
         }
       ) -> output
+    for (i in names(classes)[classes == "numeric"]) {
+      translate(unique(object[[i]]), unique(output[[i]]))$df
+    }
     id <- paste0("id", as.integer(Sys.time()))
     object@data[, id] <- seq_along(object)
     output %>%
@@ -72,12 +76,12 @@ setMethod(
       over(object[id]) %>%
       bind_cols(output) %>%
       inner_join(object@data, by = names(object)) %>%
-      select(-1) %>%
-      mutate(ranking = rank(.data$original_ranking)) -> set
+      mutate(ranking = rank(.data$original_ranking) - 1) -> set
     set <- SpatialPointsDataFrame(
       coords = set[, the_names],
-      data = set[, !colnames(set) %in% the_names]
+      data = set[, !colnames(set) %in% c(the_names, id)]
     )
+    object@data[, id] <- NULL
     return(list(object = set, design = output))
   }
 )

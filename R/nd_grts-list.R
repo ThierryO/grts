@@ -127,16 +127,16 @@ setMethod("nd_grts", signature(object = "list"), function(object, ...) {
     }
   }
 
-  for (i in seq_along(unified)) {
+  for (i in names(unified)) {
     if (numerics[i]) {
       design[, i] <- unified[[i]][design[, i]]
     } else {
-      distance <- abs(outer(unified[[i]], object[[i]], "-"))
-      nearest <- apply(distance, 2, which.min)
-      design <- design[design[, i] %in% nearest, ]
-      z <- vector("integer", n2)
-      z[nearest] <- object[[i]]
-      design[, i] <- z[design[, i]]
+      object[[i]] %>%
+        as.integer() %>%
+        translate(unified[[i]]) %>%
+        `[[`("vec") %>%
+        `[`(design[, i]) -> design[, i]
+      design <- design[!is.na(design[, i]), ]
     }
   }
 
