@@ -9,6 +9,7 @@
 #' @importFrom assertthat assert_that has_name is.flag is.string noNA
 #' @importFrom dplyr %>%
 #' @importFrom stats setNames
+#' @importFrom utils head
 #' @include nd_grts.R
 #' @details
 #' - `new.length` the new length of the unified vector. This will be rounded upwards to a power of 2.

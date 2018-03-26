@@ -41,7 +41,6 @@ Collate:
     'GRTSpolygons.R'
     'QuadratRanking.R'
     'check_cellsize.R'
-    'halton.R'
     'nd_grts.R'
     'nd_grts-list.R'
     'nd_grts-data_frame.R'
