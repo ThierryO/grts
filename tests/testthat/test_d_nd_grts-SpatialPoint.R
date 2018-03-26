@@ -74,6 +74,17 @@ test_that("nd_grts works on SpatialPointsDataFrame", {
     length(unique(output$design$original_ranking)),
     nrow(unique(output$design[, c("original_ranking", "ranking")]))
   )
+  expect_identical(
+    names(output$object),
+    c(names(object), "original_ranking", "ranking")
+  )
+  expect_identical(
+    sort(names(output$design)),
+    as.data.frame(object[1, ]) %>%
+      colnames() %>%
+      c("original_ranking", "ranking") %>%
+      sort()
+  )
 
   expect_is(output <- nd_grts(object, cellsize = c(2, 2)), "list")
   expect_identical(
@@ -99,4 +110,22 @@ test_that("nd_grts works on SpatialPointsDataFrame", {
   )
 
   expect_warning(nd_grts(object, reference = "Y"))
+
+  object@data$A <- object@data$A * 1.5
+  expect_is(output <- nd_grts(object), "list")
+  expect_identical(
+    sapply(output$object@data[, names(object), drop = FALSE], class),
+    sapply(object@data, class)
+  )
+
+  object@data$A <- factor(object@data$A)
+  expect_is(output <- nd_grts(object), "list")
+  expect_identical(
+    sapply(output$object@data[, names(object), drop = FALSE], class),
+    sapply(object@data, class)
+  )
+  expect_identical(
+    levels(output$object$A),
+    levels(object$A)
+  )
 })
