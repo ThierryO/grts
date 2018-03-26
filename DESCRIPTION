@@ -3,8 +3,13 @@ Type: Package
 Title: Spatially Balanced Sampling Based on GRTS
 Version: 0.2.1
 Date: 2015-07-28
-Author: Thierry Onkelinx, Paul Quataert
-Maintainer: Thierry Onkelinx <Thierry.Onkelinx@inbo.be>
+Authors@R: c(
+  person("Thierry", "Onkelinx", role = c("aut", "cre"),
+    email = "thierry.onkelinx@inbo.be",
+    comment = "http://orcid.org/0000-0001-8804-4216"),
+  person("Paul", "Quataert", role = c("aut"),
+    email = "paul.quataert@inbo.be",
+    comment = "https://orcid.org/0000-0002-6894-9402"))
 Description: Spatially balanced sampling based on the general randomized 
   tessellation stratified principle by Stevens, Don L. and Olsen, Anthony R. 
   (1999) "Spatially balanced sampling of natural resources" Journal of the 
