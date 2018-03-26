@@ -118,6 +118,13 @@ test_that("nd_grts works on SpatialPointsDataFrame", {
     sapply(object@data, class)
   )
 
+  object@data$A <- as.character(object@data$A)
+  expect_is(output <- nd_grts(object), "list")
+  expect_identical(
+    sapply(output$object@data[, names(object), drop = FALSE], class),
+    sapply(object@data, class)
+  )
+
   object@data$A <- factor(object@data$A)
   expect_is(output <- nd_grts(object), "list")
   expect_identical(

@@ -81,6 +81,9 @@ setMethod(
         `[`(output[[i]]) -> output[[i]]
       output <- output[!is.na(output[[i]]), ]
       output[[i]] <- factor(output[[i]], labels = level[[i]])
+      if (inherits(object[[i]], "character")) {
+        output[[i]] <- as.character(output[[i]])
+      }
     }
     for (i in names(object_list)[sapply(object_list, inherits, "numeric")]) {
       ts <- as.integer(Sys.time())
