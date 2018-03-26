@@ -8,7 +8,7 @@
 #' @importFrom methods setMethod
 #' @importFrom assertthat has_name assert_that
 #' @importFrom sp bbox over SpatialPoints SpatialPointsDataFrame coordinates
-#' @importFrom dplyr %>% mutate inner_join select bind_cols mutate_at distinct select_at
+#' @importFrom dplyr %>% mutate inner_join select bind_cols mutate_at distinct select_at rename_all rename_at
 #' @importFrom rlang .data
 #' @importFrom stats setNames
 #' @include nd_grts-list.R
@@ -33,7 +33,18 @@ setMethod(
       max() %>%
       log2() %>%
       ceiling() -> levels
-    classes <- sapply(object@data, class)
+    object_list <- lapply(object@data, unique)
+    for (i in which(sapply(object_list, is.integer))) {
+      object_list[[i]] <- min(object_list[[i]]):max(object_list[[i]])
+    }
+    for (i in which(sapply(object_list, is.character))) {
+      object_list[[i]] <- factor(object_list[[i]])
+    }
+    for (i in which(sapply(object_list, is.factor))) {
+      this_level <- levels(object_list[[i]])
+      object_list[[i]] <- as.integer(object_list[[i]])
+      attr(object_list[[i]], "levels") <- this_level
+    }
     if (has_name(dots, "scale")) {
       if (any(names(dots$scale) %in% the_names)) {
         dots$scale <- dots$scale[!names(dots$scale) %in% the_names]
@@ -51,10 +62,7 @@ setMethod(
       as.data.frame() %>%
       setNames(the_names) %>%
       as.list() %>%
-      c(
-        object@data %>%
-          lapply(unique)
-      ) %>%
+      c(object_list) %>%
       nd_grts(
         reference = the_names[1],
         scale = c(setNames(1, the_names[2]), dots$scale)
@@ -65,8 +73,26 @@ setMethod(
           x * ratio[2]
         }
       ) -> output
-    for (i in names(classes)[classes == "numeric"]) {
-      translate(unique(object[[i]]), unique(output[[i]]))$df
+    level <- lapply(object_list, attr, "levels")
+    for (i in names(level)[!sapply(level, is.null)]) {
+      unique(object_list[[i]]) %>%
+        translate(unique(output[[i]])) %>%
+        `[[`("vec") %>%
+        `[`(output[[i]]) -> output[[i]]
+      output <- output[!is.na(output[[i]]), ]
+      output[[i]] <- factor(output[[i]], labels = level[[i]])
+    }
+    for (i in names(object_list)[sapply(object_list, inherits, "numeric")]) {
+      ts <- as.integer(Sys.time())
+      unique(object_list[[i]]) %>%
+        translate(unique(output[[i]])) %>%
+        `[[`("df") %>%
+        rename_all(paste0, ts) %>%
+        inner_join(output, by = setNames(i, paste0("y", ts))) %>%
+        rename_at(paste0("y", ts), function(...) {
+          i
+        }) %>%
+        select(colnames(output)) -> output
     }
     id <- paste0("id", as.integer(Sys.time()))
     object@data[, id] <- seq_along(object)

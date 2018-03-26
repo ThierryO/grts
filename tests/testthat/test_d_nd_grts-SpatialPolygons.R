@@ -105,4 +105,52 @@ test_that("nd_grts works on SpatialPolygonsDataFrame", {
     output <- nd_grts(object, cellsize = cellsize, scale = c(A = 1)),
     "list"
   )
+  expect_identical(
+    colnames(output$object@data),
+    c(names(object), "original_ranking", "ranking")
+  )
+  expect_identical(
+    colnames(output$design),
+    c("x", "y", names(object), "original_ranking", "ranking")
+  )
+  expect_identical(
+    sapply(object@data, class),
+    sapply(output$design[names(object)], class)
+  )
+
+  object@data$A <- as.numeric(object@data$A)
+  expect_is(
+    output <- nd_grts(object, cellsize = cellsize),
+    "list"
+  )
+  expect_identical(
+    colnames(output$object@data),
+    c(names(object), "original_ranking", "ranking")
+  )
+  expect_identical(
+    colnames(output$design),
+    c("x", "y", names(object), "original_ranking", "ranking")
+  )
+  expect_identical(
+    sapply(object@data, class),
+    sapply(output$design[names(object)], class)
+  )
+
+  object@data$A <- factor(object@data$A)
+  expect_is(
+    output <- nd_grts(object, cellsize = cellsize),
+    "list"
+  )
+  expect_identical(
+    colnames(output$object@data),
+    c(names(object), "original_ranking", "ranking")
+  )
+  expect_identical(
+    colnames(output$design),
+    c("x", "y", names(object), "original_ranking", "ranking")
+  )
+  expect_identical(
+    sapply(object@data, class),
+    sapply(output$design[names(object)], class)
+  )
 })
