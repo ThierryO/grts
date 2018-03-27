@@ -1,0 +1,226 @@
+---
+title: "Short introduction to GRTS"
+author: "Thierry Onkelinx"
+date: "26 maart 2018"
+bibliography: grts.bib
+output: rmarkdown::html_document
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteDepends{ggplot2}
+  %\VignetteDepends{dplyr}
+  %\VignetteIndexEntry{Short introduction to GRTS}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+set.seed(20180325)
+library(knitr)
+opts_chunk$set(
+  echo = FALSE, 
+  fig.height = 4,
+  fig.width = 4
+)
+library(ggplot2)
+library(dplyr)
+theme_set(theme_gray(8))
+```
+
+The goal of this vignette is to give a very short introduction on Generalized Random Tessellation Stratified sampling (GRTS) the make the users of this package familiary with the basic idea behind GRTS. GRTS was developed in @Stevens_Olsen_1999 and @Stevens_Olsen_2004.
+
+```{r}
+n_level <- 3
+expand.grid(
+  x = seq_len(2 ^ n_level) - 1,
+  y = seq_len(2 ^ n_level) - 1
+) %>%
+  mutate(
+    l1 = 2 * x %/% 4 + y %/% 4,
+    l2 = 2 * x %/% 2 %% 2 + y %/% 2 %%2,
+    l3 = 2 * x %% 2 + y %% 2,
+    b4 = paste0(l1, l2, l3),
+    b4r = paste0(l3, l2, l1),
+    order = ((l1 * 4) + l2) * 4 + l3,
+    rev_order = ((l3 * 4) + l2) * 4 + l1
+  ) -> design
+design %>%
+  inner_join(
+    design %>%
+      distinct(l1) %>%
+      mutate(rl1 = sample(l1)),
+    by = "l1"
+  ) %>%
+  inner_join(
+    design %>%
+      distinct(l1, l2) %>%
+      group_by(l1) %>%
+      mutate(rl2 = sample(l2)),
+    by = c("l1", "l2")
+  ) %>%
+  inner_join(
+    design %>%
+      distinct(l1, l2, l3) %>%
+      group_by(l1, l2) %>%
+      mutate(rl3 = sample(l3)),
+    by = c("l1", "l2", "l3")
+  ) %>%
+  mutate(
+    rb4 = paste0(rl1, rl2, rl3),
+    rb4r = paste0(rl3, rl2, rl1),
+    rorder = ((rl1 * 4) + rl2) * 4 + rl3,
+    rrev_order = ((rl3 * 4) + rl2) * 4 + rl1
+  ) -> design
+```
+
+## Quandrant recursive map
+
+A key component of GRTS is translating 2D coordinates to 1D coordinates. This is done by quandrant recursive maps [@Stevens_Olsen_1999; @Stevens_Olsen_2004]. The map is split in 4 quadrants by splitting it halfway along the x axis and halfway along the y axis. This yields the level-1 split. Let's apply this principle on a simple data set. For sake of simplicity we use a square grid with 8 cells in each dimension. Splitting these 64 grid cells results in 4 quadrants of each 16 grid cells.
+
+```{r l1, fig.cap = "Level 1 split of the example data"}
+empty <- ggplot(design, aes(x = x, y = y)) + 
+  coord_fixed() +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0)) + 
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+empty +
+  geom_tile(aes(fill = as.character(l1))) +
+  geom_point(alpha = 0.25) +
+  geom_text(
+    data = design %>%
+      group_by(l1) %>%
+      summarise_at(c("x", "y"), mean),
+    aes(label = l1)
+  ) +
+  scale_fill_discrete(guide = "none")
+```
+
+Each quadrant of level-1 is in a similar way split into 4 subquadrants. This yields 16 level-2 quadrants. Each of those level-2 quadrants contains 4 points.
+
+```{r l2, fig.cap = "Level 2 split of the example data"}
+empty +
+  geom_tile(aes(fill = as.character(l2))) +
+  geom_point(alpha = 0.2) +
+  geom_text(
+    data = design %>%
+      group_by(l1, l2) %>%
+      summarise_at(c("x", "y"), mean),
+    aes(label = l2)
+  ) +
+  scale_fill_discrete(guide = "none")
+```
+
+This is recursively applied until each quadrant contains only one element or the dimensions of the quadrants are small enough. Three levels are sufficient to ensure that each quadrant contains only one point.
+
+```{r l3, fig.cap = "Level 3 split of the example data"}
+empty +
+  geom_tile(aes(fill = as.character(l3))) +
+  geom_point(alpha = 0.2) +
+  geom_text(
+    data = design %>%
+      group_by(l1, l2, l3) %>%
+      summarise_at(c("x", "y"), mean),
+    aes(label = l3)
+  ) +
+  scale_fill_discrete(guide = "none")
+```
+
+## Reverse hierarchical ordering
+
+We index each subquadrant within a quandrant uniquely with the numbers 0, 1, 2 or 3. The combination of this index with the indices of all lower levels gives a unique 1D address to each subquadrant. The level-1 quadrants need only 1 index, the level-2 quadrants require 2 indices (level-1 and level-2), ...
+
+The 1D address can be though of as a base-4 number. In a typical hierarchical order we would use level-1 as the highest digit, level-2 as the next digit, and so on. The figure below shows the base-4 indices up to the third level. The background of each cell is coloured along a gradient of address (after conversion to base-10). The change in colour clearly reflects the level-1 structure. Adding 1 to the lowest digit (level-3 in this example), results in 3 out of 4 times in moving to a neighouring cell. In other cases we would go to a cell in a neighbouring quadrant of a higher level. Thus the 1D address of neighbouring cells will be similar.
+
+```{r b4, fig.cap = "1D adresses based on the normal hierarchical order"}
+empty +
+  geom_tile(aes(fill = order)) +
+  geom_text(aes(label = b4)) +
+  scale_fill_gradientn(colors = terrain.colors(4), guide = "none")
+```
+
+The picture changes if we reverse the hierarchical order. Now we use level-1 as the lowest digit, level-2 as the second lowest digit, and so on. Adding 1 to the lowest digit, will now result in moving to another level-1 quadrant. Hence the corresponding movement in 2D is always large. This is clearly illustrated in the image below.
+
+```{r b4r, fig.cap = "1D adresses based on the reverse hierarchical order"}
+empty +
+  geom_tile(aes(fill = rev_order)) +
+  geom_text(aes(label = b4r)) +
+  scale_fill_gradientn(colors = terrain.colors(4), guide = "none")
+```
+
+## Randomisation
+
+The randomisation is done by permuting the indices of the subquadrants. Each split of a quadrant in 4 subquadrants uses an independent random permutation. The next three images display a randomisation for each of the levels in the example data set. Note that each quadrant has a random permutation of its subquadrants.
+
+```{r, fig.cap = "Randomised level 1 split of the example data"}
+empty +
+  geom_tile(aes(fill = as.character(rl1))) +
+  geom_point(alpha = 0.25) +
+  geom_text(
+    data = design %>%
+      group_by(rl1) %>%
+      summarise_at(c("x", "y"), mean),
+    aes(label = rl1)
+  ) +
+  scale_fill_discrete(guide = "none")
+```
+
+```{r, fig.cap = "Randomised level 2 split of the example data"}
+empty +
+  geom_tile(aes(fill = as.character(rl2))) +
+  geom_point(alpha = 0.25) +
+  geom_text(
+    data = design %>%
+      group_by(rl1, rl2) %>%
+      summarise_at(c("x", "y"), mean),
+    aes(label = rl2)
+  ) +
+  scale_fill_discrete(guide = "none")
+```
+
+```{r, fig.cap = "Randomised level 3 split of the example data"}
+empty +
+  geom_tile(aes(fill = as.character(rl3))) +
+  geom_point(alpha = 0.2) +
+  geom_text(
+    data = design %>%
+      group_by(rl1, rl2, rl3) %>%
+      summarise_at(c("x", "y"), mean),
+    aes(label = rl3)
+  ) +
+  scale_fill_discrete(guide = "none")
+```
+
+After the random permutation, the quandrant indices are combined into the 1D addresses. The images below display both the 1D adressen in normal hierarchical order and in reverse hierarchical order.
+
+```{r rb4, fig.cap = "Randomised 1D adresses based on the normal hierarchical order"}
+empty +
+  geom_tile(aes(fill = rorder)) +
+  geom_text(aes(label = rb4)) +
+  scale_fill_gradientn(colors = terrain.colors(4), guide = "none")
+```
+
+```{r rb4r, fig.cap = "Randomised 1D adresses based on the reverse hierarchical order"}
+empty +
+  geom_tile(aes(fill = rrev_order)) +
+  geom_text(aes(label = rb4r)) +
+  scale_fill_gradientn(colors = terrain.colors(4), guide = "none")
+```
+
+## Selection of the sample
+
+The actual selection of the sample from the 1D address come in two flavours. The oldest flavour [@Stevens_Olsen_1999] uses the normal hierarchical ordering. The actual sample uses a systematic sampling along the 1D addresses. It samples every $N/n$ 1D address and uses a random start between $0$ and $N/n - 1$. 
+
+A more recent flavour [@Stevens_Olsen_2004, @Stevens_Olsen_2003, @Theobald_etal_2007], is based on the reverse hierarchical ordering. The actual sample uses the first $n$ 1D addresses.
+
+### Benefits of the normal hierarchical order
+
+- Unequal probablity sampling is easy to implement. Consider each 1D address to be a line segment with length proportional to inclusion probability. Concatenate all line segments according to the order of the 1D address. Take a systematic sample along this concatenated line.
+
+### Benefits of the reverse hierarchical order
+
+- Replacement of drop-out samples is easy. Just take the next available 1D address.
+- Repeated sampling in time is possible, provided the entire region is covered as a GRTS grid. 
+
+## References
