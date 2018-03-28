@@ -27,12 +27,13 @@ Imports:
   spatstat, 
   RODBC
 Suggests: 
-  testthat,
-  plyr, 
+  knitr,
   ggplot2, 
-  xtable, 
+  plyr, 
   reshape,
-  knitr
+  testthat,
+  tidyr,
+  xtable 
 VignetteBuilder: 
   knitr
 RoxygenNote: 6.0.1
