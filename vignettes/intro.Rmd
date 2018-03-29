@@ -25,7 +25,7 @@ library(dplyr)
 theme_set(theme_gray(8))
 ```
 
-The goal of this vignette is to give a very short introduction on Generalized Random Tessellation Stratified sampling (GRTS) the make the users of this package familiary with the basic idea behind GRTS. GRTS was developed in @Stevens_Olsen_1999 and @Stevens_Olsen_2004.
+The goal of this vignette is to give a very short introduction on Generalized Random Tessellation Stratified sampling (GRTS) to make the users of this package familiar with the basic idea behind GRTS. GRTS was developed in @Stevens_Olsen_1999 and @Stevens_Olsen_2004.
 
 ```{r}
 n_level <- 3
@@ -216,7 +216,7 @@ A more recent flavour [@Stevens_Olsen_2004, @Stevens_Olsen_2003, @Theobald_etal_
 
 ### Benefits of the normal hierarchical order
 
-- Unequal probablity sampling is easy to implement. Consider each 1D address to be a line segment with length proportional to inclusion probability. Concatenate all line segments according to the order of the 1D address. Take a systematic sample along this concatenated line.
+- Unequal probability sampling is easy to implement. Consider each 1D address to be a line segment with length proportional to inclusion probability. Concatenate all line segments according to the order of the 1D address. Take a systematic sample along this concatenated line.
 
 ### Benefits of the reverse hierarchical order
 
