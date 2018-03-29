@@ -541,7 +541,7 @@ ggplot(tmp, aes(x = Samples)) +
 ```
 
 ## Using the package
-The workhorse of the package is the `QuadratRanking()` function. This function expects a zero-filled, square matrix with the number of rows equal to a power of 2. However the function does not do any checking on those assumptions. That would be a computational burden since the function is called recursively. Therefore one should not call `QuadratRanking()` directly but use the global wrapper function `GRTS()`. This wrapper function handles more conviniently different input formats.
+The workhorse of the package is the `QuadratRanking()` function. This function expects a zero-filled, square matrix with the number of rows equal to a power of 2. However the function does not do any checking on those assumptions. That would be a computational burden since the function is called recursively. Therefore one should not call `QuadratRanking()` directly but use the global wrapper function `GRTS()`. This wrapper function handles more conveniently different input formats.
 
 ### Calculating a GRTS randomisation for a square matrix
 
