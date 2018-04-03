@@ -31,6 +31,8 @@ Suggests:
   ggplot2, 
   plyr, 
   reshape,
+  rgeos,
+  rmarkdown,
   testthat,
   tidyr,
   xtable 

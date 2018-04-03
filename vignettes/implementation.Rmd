@@ -7,9 +7,10 @@ output: rmarkdown::html_document
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteDepends{ggplot2}
-  %\VignetteEngine{dplyr}
-  %\VignetteEngine{tidyr}
-  %\VignetteEngine{sp}
+  %\VignetteDepends{dplyr}
+  %\VignetteDepends{tidyr}
+  %\VignetteDepends{sp}
+  %\VignetteDepends{rgeos}
   %\VignetteIndexEntry{Our implementation of GRTS}
   %\VignetteEncoding{UTF-8}
 ---
