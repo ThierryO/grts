@@ -7,9 +7,9 @@
 #' @method nd_grts SpatialPointsDataFrame-method
 #' @importFrom methods setMethod
 #' @importFrom assertthat has_name assert_that
-#' @importFrom sp bbox over SpatialPointsDataFrame coordinates SpatialPixelsDataFrame fullgrid<-
-#' @importFrom dplyr %>% mutate inner_join select bind_cols mutate_at distinct
-#' @importFrom rlang .data
+#' @importFrom sp bbox over SpatialPointsDataFrame coordinates SpatialPixelsDataFrame
+#' @importFrom dplyr %>% mutate inner_join select bind_cols mutate_at distinct group_by_at ungroup filter
+#' @importFrom rlang .data sym
 #' @importFrom stats setNames
 #' @include nd_grts-list.R
 setMethod(
@@ -85,6 +85,7 @@ setMethod(
         output[[i]] <- as.character(output[[i]])
       }
     }
+    object_data <- object@data
     for (i in names(object_list)[sapply(object_list, inherits, "numeric")]) {
       ts <- as.integer(Sys.time())
       unique(object_list[[i]]) %>%
@@ -96,31 +97,54 @@ setMethod(
           i
         }) %>%
         select(colnames(output)) -> output
+      unique(object@data[[i]]) %>%
+        translate(sort(unique(output[[i]]))) %>%
+        `[[`("df") %>%
+        rename_all(paste0, ts) %>%
+        inner_join(object_data, by = setNames(i, paste0("x", ts))) %>%
+        rename_at(paste0("y", ts), function(...) {
+          i
+        }) %>%
+        select(colnames(object_data)) -> object_data
     }
     id <- paste0("id", as.integer(Sys.time()))
     output[, id] <- seq_len(nrow(output))
-    grid <- SpatialPixelsDataFrame( #nolint
-      points = output[, the_names],
-      data = output[id],
+    id_bangbang <- sym(id)
+    output %>%
+      group_by_at(the_names) %>%
+      mutate(min_id = min(!!id_bangbang)) %>%
+      ungroup() -> output
+    output %>%
+      filter(!!id_bangbang == .data$min_id) %>%
+      as.data.frame() -> locations
+    object@data
+    SpatialPixelsDataFrame( #nolint
+      points = locations[, the_names],
+      data = locations["min_id"],
       proj4string = object@proj4string
     ) %>%
-      `fullgrid<-`(TRUE)
-    grid %>%
       over(x = object) %>%
+      bind_cols(object_data) %>%
       inner_join(
         output %>%
-          select(c(id, the_names)),
-        by = id
+          select(c("min_id", id, names(object))),
+        by = c("min_id", names(object))
       ) %>%
-      select(-1) %>%
-      bind_cols(object@data) %>%
-      inner_join(output, by = c(the_names, colnames(object@data))) %>%
-      select(c(colnames(object@data), "original_ranking")) %>%
+      select(!!id_bangbang) %>%
+      inner_join(output, by = id) %>%
+      select(c(names(object), "original_ranking")) %>%
       SpatialPointsDataFrame(coords = coordinates(object)) -> set
     set@data %>%
       distinct(.data$original_ranking) %>%
       mutate(ranking = rank(.data$original_ranking) - 1) %>%
       inner_join(x = set@data, by = "original_ranking") -> set@data
-    return(list(object = set, design = output[names(output) != id]))
+    return(
+      list(
+        object = set,
+        design = output[
+          c(the_names, names(object), "original_ranking", "ranking")
+        ]
+      )
+    )
   }
 )
