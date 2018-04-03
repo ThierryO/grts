@@ -247,3 +247,39 @@ ggplot(as.data.frame(grts$object), aes(x = x, y = y)) +
     axis.ticks = element_blank()
   )
 ```
+
+## `SpatialPolygonsDataFrame`
+
+```{r, fig.cap = "Example data for `SpatialPolygonsDataFrame`"}
+meuse %>%
+  mutate(
+    x = x + rnorm(n(), sd = 50),
+    y = y + rnorm(n(), sd = 50)
+  ) %>%
+  `coordinates<-`(c("x", "y")) -> meuse.dat
+coordinates(meuse) <- c("x", "y")
+library(rgeos)
+triang <- gDelaunayTriangulation(meuse)
+SpatialPolygonsDataFrame(
+  triang,
+  over(triang, meuse)
+) %>%
+  gUnaryUnion(.@data$ffreq) %>%
+  SpatialPolygonsDataFrame(
+    meuse@data %>%
+      distinct(ffreq)
+  ) -> meuse.dat
+spplot(meuse.dat, zcol = "ffreq")
+```
+
+```{r fig.cap = "Sample of 20 elements"}
+grts <- nd_grts(meuse.dat, cellsize = c(200, 200))
+str(grts, 1)
+grts$object %>%
+  subset(ranking < 20) %>%
+  as.data.frame() %>%
+  ggplot(aes(x = x, y = y, colour = ffreq)) +
+  geom_point() +
+  coord_equal()
+```
+
