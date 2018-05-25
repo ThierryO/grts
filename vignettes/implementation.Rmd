@@ -207,14 +207,22 @@ glimpse(grts$object)
 ```
 
 
-```{r fig.cap = "Full grid with the GRTS ranking"}
-spplot(grts$design, zcol = "ranking")
-```
+Below is a sample of all points from the `object` element with a ranking number below 10. Note that several points have the same ranking number when they belong to the same `design` grid cell.
 
 
 ```{r}
 grts$object %>%
   subset(ranking < 10)
+```
+
+```{r fig.cap = "Sample of the points from the `object` element with ranking < 10.", message=FALSE}
+grts$object %>%
+  as_tibble() %>% 
+  filter(ranking < 10) %>%
+  ggplot(aes(x = x, y = y, colour = ranking)) +
+  geom_point() +
+  scale_colour_gradientn(colours = get_col_regions()) +
+  coord_fixed()
 ```
 
 ### `SpatialPointsDataFrame`
