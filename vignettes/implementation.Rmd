@@ -229,6 +229,7 @@ grts$object %>%
 ### `SpatialPointsDataFrame`
 
 Analogous to the `SpatialPoints` case, the returned `object` element is a `SpatialPointsDataFrame`.
+Note that the `design` element is now a *dataframe* and not a `SpatialGridDataFrame` because it has more than two dimensions.
 
 ```{r}
 meuse %>%
