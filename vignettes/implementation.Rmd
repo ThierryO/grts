@@ -228,6 +228,8 @@ grts$object %>%
 
 ### `SpatialPointsDataFrame`
 
+Analogous to the `SpatialPoints` case, the returned `object` element is a `SpatialPointsDataFrame`.
+
 ```{r}
 meuse %>%
   select(x, y) %>%
