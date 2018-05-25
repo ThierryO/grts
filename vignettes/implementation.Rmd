@@ -178,13 +178,21 @@ ggplot(meuse, aes(x = x, y = y, colour = elev)) +
   coord_fixed()
 ```
 
-```{r fig.cap = "Full grid with the GRTS ranking"}
+```{r}
 meuse %>%
   select(x, y) %>%
   SpatialPoints() -> meuse.dat
 grts <- nd_grts(meuse.dat, cellsize = c(200, 200))
 str(grts, 1)
+```
+
+
+```{r fig.cap = "Full grid with the GRTS ranking"}
 spplot(grts$design, zcol = "ranking")
+```
+
+
+```{r}
 grts$object %>%
   subset(ranking < 10)
 ```
