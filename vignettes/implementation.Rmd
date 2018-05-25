@@ -170,7 +170,7 @@ grts$object %>%
 
 ### `SpatialPoints`
 
-Here we will work with the original meuse dataset using only the x and y coordinates. The `design` element of the `nd_grts()` output now contains a `SpatialGridDataFrame` with the GRTS ranking. The `object` element is a `SpatialPointsDataFrame` containing the centroids from the `design` grid cells which contain at least one point from the input.
+Here we will work with the original meuse dataset using only the x and y coordinates.
 
 ```{r echo = FALSE, fig.cap = "Full meuse data set"}
 ggplot(meuse, aes(x = x, y = y, colour = elev)) + 
@@ -178,12 +178,32 @@ ggplot(meuse, aes(x = x, y = y, colour = elev)) +
   coord_fixed()
 ```
 
+
+
 ```{r}
 meuse %>%
   select(x, y) %>%
   SpatialPoints() -> meuse.dat
 grts <- nd_grts(meuse.dat, cellsize = c(200, 200))
 str(grts, 1)
+```
+
+The `design` element of the `nd_grts()` output now contains a `SpatialGridDataFrame` with the GRTS ranking:
+
+```{r}
+glimpse(grts$design)
+```
+
+```{r fig.cap = "Full grid with the GRTS ranking"}
+spplot(grts$design, zcol = "ranking")
+```
+
+
+The `object` element is a `SpatialPointsDataFrame`. It is the original `SpatialPoints` input extended with the `original_ranking` and `ranking` attributes from those `design` grid cells that contain at least one point from the input:
+
+
+```{r}
+glimpse(grts$object)
 ```
 
 
