@@ -37,7 +37,7 @@ The workhorse of this package is `nd_ranking()`. It is not indented to be called
 
 ## Number of dimensions
 
-The goal of GRTS is create spatially balanced samples. Hence with two dimensions in mind. However at each hierarchical level, each dimension is split separately into two equal sized segments and then the indices are recombined in the a 1D address. So we could apply exactly to same algorithm on a 1 dimensional object. This would be the equivalent of splitting a line segment recursively in half. This is illustrated in the image below. An expansion into 3D is similar. A cube is the 3D equivalent of the 2D quadrant. The cube is split in two halves along each of its dimensions resulting in 8 subcubes. We can generalise this into $n$ dimensions. We start with an $n$ dimensional hypercube which is split in half along each of the $n$ dimensions resulting in $2^n$ sub-hypercubes.
+The goal of GRTS is to create spatially balanced samples. Hence with two dimensions in mind. However at each hierarchical level, each dimension is split separately into two equal sized segments and then the indices are recombined into a 1D address. So we could apply exactly the same algorithm on a 1 dimensional object. This would be the equivalent of splitting a line segment recursively in half. This is illustrated in the image below. An expansion into 3D is similar. A cube is the 3D equivalent of the 2D quadrant. The cube is split in two halves along each of its dimensions resulting in 8 subcubes. We can generalise this into $n$ dimensions. We start with an $n$ dimensional hypercube which is split in half along each of the $n$ dimensions resulting in $2^n$ sub-hypercubes.
 
 ```{r echo = FALSE, fig.height = 1, fig.cap = "Hierarchical binary split of a 1 dimensional dataset"}
 data.frame(x = 0:7) %>%
@@ -67,9 +67,9 @@ data.frame(x = 0:7) %>%
 
 ## Number of elements in each dimension
 
-Our algorithm demands that each dimension consist of $2^n$ elementen. This is in a real life dataset seldom the case. To relief the users from this problem, we created the `nd_grts()` function which handles several relevant classes: `list`, `data.frame`, `SpatialPoints`, `SpatialPointsDataFrame`, `SpatialPolygons` and `SpatialPolygonsDataFrame`. We will describe the main principle based on the `list` because the other classes can be seen as a special case.
+Our algorithm demands that each dimension consists of $2^n$ elements. This is seldom the case in a real life dataset. To relief the users from this problem, we created the `nd_grts()` function which handles several relevant classes: `list`, `data.frame`, `SpatialPoints`, `SpatialPointsDataFrame`, `SpatialPolygons` and `SpatialPolygonsDataFrame`. We will describe the main principle based on the `list` because the other classes can be seen as a special case.
 
-When a `list` is supplied to `nd_grts()`, each element of the list represents one dimension. The elements should be a vector with unique values. Every vector $x$ will be expanded by `nd_grts()` into a vector $y$ of length $2^n$ with equal $n$ for all vectors of the list. The values of $y$ are interpreted as the midpoints of equal sized intervals. The smallest $n$ in choosen so that each interval defined by $y$ contains no more than one element from $x$. Let's illustrate this with the example below.
+When a `list` is supplied to `nd_grts()`, each element of the list represents one dimension. The elements should be a vector with unique values. Every vector $x$ will be expanded by `nd_grts()` into a vector $y$ of length $2^n$ with equal $n$ for all vectors of the list. The values of $y$ are interpreted as the midpoints of equal sized intervals. The smallest $n$ is chosen for which each interval defined by $y$ contains no more than one element from $x$. Let's illustrate this with the example below.
 
 ```{r}
 x <- c(0.5, 1, 5)
@@ -104,7 +104,7 @@ nd_grts(list(x = x), new.length = 2 ^ n)
 
 In some cases we want a fixed scaling between some of the variables. An obvious example is a spatial layout were it makes more sense to keep a fixed scaling between both coordinates so that the distance between the points remains Euclidean. Therefore we added two more arguments to `nd_grts()`: `reference` and `scale`. `reference` must be a single character with the name of the dimension which is used as reference. `scale` is a named numeric vector defining the scale. Scale is somewhat analogue to the scale on maps: one unit of the reference equals $s$ units of the scaled variable. E.g. `reference = "A"` and `scale = c(B = 2, C = 1)` implies that 1 unit of "A" is as large as 2 units of "B" and as 1 unit of "C". 
 
-The scaling works slightly different with `Spatial` objects. The first coordinate of is always used as the reference. The `Spatial` object is internally converted into a grid. The size of the grid cells is defined by the `cellsize` argument. The scale of the second coordinate is fixed to the ratio of the cellsizes. The user still can provide a `scale` argument in case of a `SpatialXXXDataFrame`. This is used to set a scale on the variables in the data.frame.
+The scaling works slightly different with `Spatial` objects. The first coordinate of is always used as the reference. The `Spatial` object is internally converted into a grid. The size of the grid cells is defined by the `cellsize` argument. The scale of the second coordinate is fixed to the ratio of the cellsizes. The user can still provide a `scale` argument in case of a `SpatialXXXDataFrame`. This is used to set a scale on the variables in the data.frame.
 
 ## Usage examples
 
@@ -123,7 +123,7 @@ ggplot(meuse.dat, aes(x = x, y = y, colour = elev)) +
   coord_fixed()
 ```
 
-The output of `nd_grts()` on a `data.frame` is a `list` with two elements: `object` and `design`. If all the variables are numeric, then `design` is the full grid on which the randomised 1D addresses are calculated. It contains the variables from the input augmented with two variables: `original_ranking` and `ranking`. `original_ranking` is output of `nd_ranking()` whereas `ranking` is the rank of `original_ranking`. `ranking` is identical to `original_ranking` when looking at the full grid. The `object` element from the list contains the subset of `design` which matches with the input data.frame. Note that the closest matches are returned, not the exact matches. While `original_rank` remains unchanged, `rank` is recalcuated.
+The output of `nd_grts()` on a `data.frame` is a `list` with two elements: `object` and `design`. If all the variables are numeric, then `design` is the full grid on which the randomised 1D addresses are calculated. It contains the variables from the input augmented with two variables: `original_ranking` and `ranking`. `original_ranking` is output of `nd_ranking()` whereas `ranking` is the rank of `original_ranking`. `ranking` is identical to `original_ranking` when looking at the full grid. The `object` element from the list contains the subset of `design` which matches with the input data.frame. Note that the closest matches are returned, not the exact matches. While `original_ranking` remains unchanged, `ranking` is recalculated.
 
 ```{r}
 grts <- nd_grts(meuse.dat)
@@ -140,7 +140,7 @@ grts$object %>%
   coord_fixed()
 ```
 
-`nd_grts()` can also handle integers, factors and characters. Characters are internally converted to factors, factors to integers and integers to numerics. The GRTS ranking is then calculated on the numeric values. Variables that were converted into numerics are backtransformed into their original class. The numeric values which are the nearest to the integer values are retained, the other values are discared. Hence, the `design` element from the output no longer contains all combinations used in `nd_ranking()` but only the relevant ones. `original_ranking` still is the values returned by `nd_ranking()`, `ranking` is it rank.
+`nd_grts()` can also handle integers, factors and characters. Characters are internally converted to factors, factors to integers and integers to numerics. The GRTS ranking is then calculated on the numeric values. Variables that were converted into numerics are backtransformed into their original class. The numeric values which are the nearest to the integer values are retained, the other values are discared. Hence, the `design` element from the output no longer contains all combinations used in `nd_ranking()` but only the relevant ones. `original_ranking` still is the values returned by `nd_ranking()`, `ranking` is its rank.
 
 ```{r fig.cap = "Example data.frame with a factor"}
 meuse %>%
@@ -206,7 +206,7 @@ grts$object %>%
 
 ## `SpatialPolygons`
 
-For this example we use the `meuse.area` data set which is the outline of the `meuse` data set. The `design` element of `nd_grts()` contains the full `SpatialGridDataFrame`. Here we demonstrate the effect of a different scaling between both coordinates by setting a different cell size for both dimensions. The much larger cell size for the second dimension requires the full grid to extent far outside the bounding box along the second coordinate. The `object` element contains a `SpatialPixelsDataFrame` with the pixels who's centroid is contained within the polygons. Here the effect of the unequal cell sizes is clearly seen.
+For this example we use the `meuse.area` data set which is the outline of the `meuse` data set. The `design` element of `nd_grts()` contains the full `SpatialGridDataFrame`. Here we demonstrate the effect of a different scaling between both coordinates by setting a different cell size for both dimensions. The much larger cell size for the second dimension requires the full grid to extend far outside the bounding box along the second coordinate. The `object` element contains a `SpatialPixelsDataFrame` with the pixels whose centroid is contained within the polygons. Here the effect of the unequal cell sizes is clearly seen.
 
 ```{r}
 data("meuse.area")
