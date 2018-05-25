@@ -218,7 +218,7 @@ grts$object %>%
   subset(ranking < 10)
 ```
 
-```{r fig.cap = "Sample of the points from the `object` element with ranking < 10.", message=FALSE}
+```{r fig.cap = "Sample of the points from the `object` element with ranking < 10.", echo=FALSE}
 grts$object %>%
   as_tibble() %>% 
   filter(ranking < 10) %>%
