@@ -168,7 +168,7 @@ grts$object %>%
   coord_fixed()
 ```
 
-## `SpatialPoints`
+### `SpatialPoints`
 
 Here we will work with the original meuse dataset using only the x and y coordinates. The `design` element of the `nd_grts()` output now contains a `SpatialGridDataFrame` with the GRTS ranking. The `object` element contains the centroids from the `design` grid cells which contain at least one point from the input.
 
@@ -189,7 +189,7 @@ grts$object %>%
   subset(ranking < 10)
 ```
 
-## `SpatialPointsDataFrame`
+### `SpatialPointsDataFrame`
 
 ```{r}
 meuse %>%
@@ -204,7 +204,7 @@ grts$object %>%
   subset(ranking < 10)
 ```
 
-## `SpatialPolygons`
+### `SpatialPolygons`
 
 For this example we use the `meuse.area` data set which is the outline of the `meuse` data set. The `design` element of `nd_grts()` contains the full `SpatialGridDataFrame`. Here we demonstrate the effect of a different scaling between both coordinates by setting a different cell size for both dimensions. The much larger cell size for the second dimension requires the full grid to extend far outside the bounding box along the second coordinate. The `object` element contains a `SpatialPixelsDataFrame` with the pixels whose centroid is contained within the polygons. Here the effect of the unequal cell sizes is clearly seen.
 
@@ -249,7 +249,7 @@ ggplot(as.data.frame(grts$object), aes(x = x, y = y)) +
   )
 ```
 
-## `SpatialPolygonsDataFrame`
+### `SpatialPolygonsDataFrame`
 
 ```{r, fig.cap = "Example data for `SpatialPolygonsDataFrame`"}
 meuse %>%
