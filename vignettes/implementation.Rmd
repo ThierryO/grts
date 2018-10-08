@@ -106,7 +106,7 @@ In some cases we want a fixed scaling between some of the variables. An obvious 
 
 The scaling works slightly different with `Spatial` objects. The first coordinate of is always used as the reference. The `Spatial` object is internally converted into a grid. The size of the grid cells is defined by the `cellsize` argument. The scale of the second coordinate is fixed to the ratio of the cellsizes. The user can still provide a `scale` argument in case of a `SpatialXXXDataFrame`. This is used to set a scale on the variables in the data.frame.
 
-Note that the GRTS algorithm requires an equal number of levels in each dimension. In the case of `Spatial` objects, this is is (internally) achieved by extending the bounding box of the grid as necessary.
+Note that the GRTS algorithm requires an equal number of levels in each dimension. In the case of `Spatial` objects, this is (internally) achieved by extending the bounding box of the grid as necessary.
 
 ## Usage examples
 
