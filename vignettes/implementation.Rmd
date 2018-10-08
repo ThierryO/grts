@@ -94,7 +94,7 @@ cbind(y - delta, y + delta)
 
 ```{r error = TRUE}
 library(GRTS)
-# nd_grts() uses a default 2 ^ n which can be too small
+# nd_grts() uses a default 2 ^ ceiling(log2(length(x))) which can be too small
 nd_grts(list(x = x))
 # set a larger length using the new.length argument
 nd_grts(list(x = x), new.length = 2 ^ n)
