@@ -21,11 +21,11 @@ Depends:
   methods
 Imports: 
   assertthat,
+  DBI,
   dplyr,
   rlang,
   sp, 
-  spatstat, 
-  RODBC
+  spatstat
 Suggests: 
   knitr,
   ggplot2, 
