@@ -7,17 +7,11 @@
 \name{nd_grts-methods}
 \alias{nd_grts-methods}
 \alias{nd_grts}
-\alias{nd_grts-methods}
 \alias{nd_grts,list-method}
-\alias{nd_grts-methods}
 \alias{nd_grts,data.frame-method}
-\alias{nd_grts-methods}
 \alias{nd_grts,SpatialPoints-method}
-\alias{nd_grts-methods}
 \alias{nd_grts,SpatialPointsDataFrame-method}
-\alias{nd_grts-methods}
 \alias{nd_grts,SpatialPolygons-method}
-\alias{nd_grts-methods}
 \alias{nd_grts,SpatialPolygonsDataFrame-method}
 \title{Calculate the N dimensional GRTS ranking for the object}
 \usage{

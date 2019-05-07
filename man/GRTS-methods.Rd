@@ -5,7 +5,6 @@
 \name{GRTS-methods}
 \alias{GRTS-methods}
 \alias{GRTS}
-\alias{GRTS-methods}
 \alias{GRTS,numeric-method}
 \alias{GRTS,SpatialGrid-method}
 \alias{GRTS,SpatialGridDataFrame-method}

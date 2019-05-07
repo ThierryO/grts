@@ -5,9 +5,7 @@
 \name{unify_length-methods}
 \alias{unify_length-methods}
 \alias{unify_length}
-\alias{unify_length-methods}
 \alias{unify_length,integer-method}
-\alias{unify_length-methods}
 \alias{unify_length,numeric-method}
 \title{Expand a vector to given length}
 \usage{

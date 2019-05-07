@@ -38,7 +38,8 @@ Suggests:
   xtable 
 VignetteBuilder: 
   knitr
-RoxygenNote: 6.0.1
+Encoding: UTF-8
+RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Collate: 
     'GRTS.R'
