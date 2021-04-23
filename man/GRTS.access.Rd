@@ -4,8 +4,17 @@
 \alias{GRTS.access}
 \title{Perform a GRTS sampling on a access database table via ODBC}
 \usage{
-GRTS.access(channel, tablename, grts.vars, cellsize, samplesize,
-  availableLevels = 20, reset = FALSE, prefix = "L", prob)
+GRTS.access(
+  channel,
+  tablename,
+  grts.vars,
+  cellsize,
+  samplesize,
+  availableLevels = 20,
+  reset = FALSE,
+  prefix = "L",
+  prob
+)
 }
 \arguments{
 \item{channel}{an ODBC channel to the database}
