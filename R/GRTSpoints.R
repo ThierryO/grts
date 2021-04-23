@@ -4,7 +4,7 @@
 #' @param cellsize The size of the GRTS grid cells. Set at half of the smallest distance between two points when missing.
 #' @param RandomStart logical. Should the starting point of grid be random or not.
 #' @export
-#' @importFrom spatstat nndist owin as.ppp as.ppp.matrix as.ppp.data.frame
+#' @importFrom spatstat.geom nndist owin as.ppp as.ppp.matrix as.ppp.data.frame
 #' @importFrom sp gridded over GridTopology coordinates bbox SpatialGridDataFrame proj4string CRS SpatialPointsDataFrame
 #' @importFrom stats runif
 #' @return a SpatialPoints object with

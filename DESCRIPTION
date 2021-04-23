@@ -17,7 +17,7 @@ Depends:
   methods
 Imports: 
   sp, 
-  spatstat, 
+  spatstat.geom, 
   RODBC
 Suggests: 
   testthat,
