@@ -11,12 +11,13 @@ Description: Spatially balanced sampling based on the general randomized
   American Statistical Association, 99, 262-278.
 License: GPL-2
 LazyLoad: yes
+Encoding: UTF-8
 Depends: 
   R (>= 2.10.0), 
   methods
 Imports: 
   sp, 
-  spatstat, 
+  spatstat.geom, 
   RODBC
 Suggests: 
   testthat,
@@ -27,4 +28,4 @@ Suggests:
   knitr
 VignetteBuilder: 
   knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.1
