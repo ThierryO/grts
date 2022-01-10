@@ -1,4 +1,8 @@
-# The GRTS package
+# The GRTS package is superseeded by the grtsdb package
+
+The new package is available at https://github.com/inbo/grtsdb, its documentation at https://inbo.github.io/grtsdb
+
+## The GRTS package
 
 | type | branch | build status | test coverage |
 | --- | --- | --- | --- |
